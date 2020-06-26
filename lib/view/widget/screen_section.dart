@@ -8,11 +8,16 @@ class ScreenSection extends StatelessWidget {
   final Widget body;
   final OnViewMore onViewMore;
   final double horizontalPadding;
-
+  final Color background;
   ScreenSection(
-      {this.body, this.title, this.onViewMore, this.horizontalPadding = 0});
+      {this.body,
+      this.title,
+      this.onViewMore,
+      this.horizontalPadding = 0,
+      this.background = Settings.COLOR_DARK_PRIMARY});
   @override
   Widget build(BuildContext context) => Container(
+        color: background,
         padding: EdgeInsets.symmetric(
           vertical: MediaQuery.of(context).size.height *
               Settings.VERTICAL_SCREEN_SECTIONS_PADDING,

@@ -74,7 +74,39 @@ class _MoviesScreenState extends State<MoviesScreen> {
                             ])))),
             onViewMore: null,
             title: "Popular",
-          )
+          ),
+          ScreenSection(
+              title: "Trending",
+              horizontalPadding: screenWidth * Settings.VERTICAL_SCREEN_PADDING,
+              background: Settings.COLOR_DARK_SECONDARY,
+              body: Container(
+                  width: screenWidth,
+                  height: screenHeight * 0.5,
+                  child: GridView.builder(
+                      itemCount: 6,
+                      scrollDirection: Axis.vertical,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          childAspectRatio: 0.7, crossAxisCount: 3),
+                      itemBuilder: (context, index) => Container(
+                            width: screenWidth * 0.22,
+                            height: screenHeight * 0.25,
+                            child: Stack(
+                              children: <Widget>[
+                                Container(
+                                  margin: EdgeInsets.all(screenWidth * 0.02),
+                                  decoration: BoxDecoration(
+                                      color: Colors.accents[index],
+                                      borderRadius: BorderRadius.circular(5)),
+                                ),
+                                Positioned(
+                                    bottom: screenHeight * 0.02,
+                                    child: MovieRatingRectangular(
+                                      text: "IMDB",
+                                      value: 5.01,
+                                    ))
+                              ],
+                            ),
+                          ))))
         ],
       ),
     ));
