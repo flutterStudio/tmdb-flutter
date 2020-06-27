@@ -1,4 +1,5 @@
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/view/screen/movie_details_screen.dart';
 import 'package:TMDB_Mobile/view/widget/movie_rating_rectangular.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,13 +17,16 @@ class MovieVerticalView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: screenHeight * 0.4,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.accents[id],
-                ),
-              ),
+              GestureDetector(
+                  onTap: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MovieDetails())),
+                  child: Container(
+                    height: screenHeight * 0.4,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.accents[id],
+                    ),
+                  )),
               Text(
                 "Movie Name (Year)",
                 overflow: TextOverflow.ellipsis,
