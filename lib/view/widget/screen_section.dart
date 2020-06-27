@@ -9,6 +9,7 @@ class ScreenSection extends StatelessWidget {
   final OnViewMore onViewMore;
   final double horizontalPadding;
   final Color background;
+
   ScreenSection(
       {this.body,
       this.title,
@@ -43,17 +44,19 @@ class ScreenSection extends StatelessWidget {
                 Expanded(
                   child: Container(),
                 ),
-                GestureDetector(
-                  child: Text(
-                    "See More",
-                    style: TextStyle(
-                        color: Settings.COLOR_DARK_TEXT,
-                        fontWeight: FontWeight.w300,
-                        fontSize: MediaQuery.of(context).size.width *
-                            Settings.FONT_SIZE_SMALL),
-                  ),
-                  onTap: onViewMore,
-                ),
+                onViewMore == null
+                    ? Container()
+                    : GestureDetector(
+                        child: Text(
+                          "See More",
+                          style: TextStyle(
+                              color: Settings.COLOR_DARK_TEXT,
+                              fontWeight: FontWeight.w300,
+                              fontSize: MediaQuery.of(context).size.width *
+                                  Settings.FONT_SIZE_SMALL),
+                        ),
+                        onTap: onViewMore,
+                      ),
                 horizontalPadding == 0
                     ? SizedBox(
                         width: MediaQuery.of(context).size.width * 0.05,
@@ -65,7 +68,10 @@ class ScreenSection extends StatelessWidget {
               height: MediaQuery.of(context).size.height *
                   Settings.VERTICAL_SCREEN_SECTIONS_PADDING,
             ),
-            body
+            horizontalPadding == 0
+                ? Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10), child: body)
+                : body
           ],
         ),
       );

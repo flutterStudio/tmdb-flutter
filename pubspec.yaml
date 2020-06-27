@@ -44,5 +44,6 @@ flutter:
     - assets/icons/play.svg
     - assets/icons/search.svg
     - assets/placeholders/trailer1.jpeg
+    - assets/placeholders/poster.jpg
 
 

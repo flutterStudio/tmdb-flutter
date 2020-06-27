@@ -1,4 +1,5 @@
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/view/widget/item_movie_verical_view.dart';
 import 'package:TMDB_Mobile/view/widget/movie_rating_rectangular.dart';
 import 'package:TMDB_Mobile/view/widget/movies_slider_widget.dart';
 import 'package:TMDB_Mobile/view/widget/screen_section.dart';
@@ -44,34 +45,7 @@ class _MoviesScreenState extends State<MoviesScreen> {
                     itemExtent: screenWidth * 0.6,
                     itemCount: 4,
                     scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) => Container(
-                        margin: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.05),
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: screenHeight * 0.4,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: Colors.accents[index],
-                                ),
-                              ),
-                              Text(
-                                "Movie Name (Year)",
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                    fontSize:
-                                        screenWidth * Settings.FONT_SIZE_MEDIUM,
-                                    fontWeight: FontWeight.w300,
-                                    color: Settings.COLOR_DARK_TEXT),
-                              ),
-                              MovieRatingRectangular(
-                                text: "IMDB",
-                                value: 7.0,
-                              )
-                            ])))),
+                    itemBuilder: (context, index) => MovieVerticalView(index))),
             onViewMore: null,
             title: "Popular",
           ),

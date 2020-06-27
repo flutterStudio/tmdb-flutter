@@ -1,4 +1,4 @@
-import 'package:TMDB_Mobile/view/screen/movies_screen.dart';
+import 'package:TMDB_Mobile/view/screen/movie_details_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Scaffold(body: MoviesScreen()),
+      home: Scaffold(body: MovieDetails()),
     );
   }
 }
