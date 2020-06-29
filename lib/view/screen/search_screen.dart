@@ -24,6 +24,7 @@ class _SearchScreenState extends State<SearchScreen> {
         floating: true,
         snap: true,
         primary: true,
+        backgroundColor: Settings.COLOR_DARK_SECONDARY,
         flexibleSpace: FlexibleSpaceBar(
             centerTitle: true,
             titlePadding: EdgeInsets.all(0),
