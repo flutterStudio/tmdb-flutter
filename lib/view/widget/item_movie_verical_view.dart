@@ -1,5 +1,4 @@
 import 'package:TMDB_Mobile/common/settings.dart';
-import 'package:TMDB_Mobile/view/screen/movie_details_screen.dart';
 import 'package:TMDB_Mobile/view/widget/movie_rating_rectangular.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +17,7 @@ class MovieVerticalView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                  onTap: () => Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MovieDetails())),
+                  onTap: () => null,
                   child: Container(
                     height: screenHeight * 0.4,
                     decoration: BoxDecoration(

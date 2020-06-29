@@ -10,12 +10,12 @@ import 'package:TMDB_Mobile/view/widget/screen_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class MovieDetails extends StatefulWidget {
+class MovieDetailsScreen extends StatefulWidget {
   @override
   _MovieDetailsState createState() => _MovieDetailsState();
 }
 
-class _MovieDetailsState extends State<MovieDetails>
+class _MovieDetailsState extends State<MovieDetailsScreen>
     with SingleTickerProviderStateMixin {
   AnimationController _animationController;
 
