@@ -24,7 +24,6 @@ class MovieStackedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
     return Stack(children: [
       Container(
         width: _width,
@@ -57,7 +56,8 @@ class MovieStackedView extends StatelessWidget {
                     style: TextStyle(
                         color: Settings.COLOR_DARK_TEXT,
                         fontWeight: FontWeight.w300,
-                        fontSize: screenWidth * Settings.FONT_SIZE_MEDIUM)),
+                        fontSize:
+                            _width * Settings.FONT_SIZE_EXTRA_LARGE_FACTOR)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -65,12 +65,12 @@ class MovieStackedView extends StatelessWidget {
                         style: TextStyle(
                             color: Settings.COLOR_DARK_TEXT,
                             fontWeight: FontWeight.w300,
-                            fontSize: screenWidth * Settings.FONT_SIZE_SMALL)),
+                            fontSize: _width * Settings.FONT_SIZE_MEDIUM)),
                     Text("Rating",
                         style: TextStyle(
                             color: Settings.COLOR_DARK_TEXT,
                             fontWeight: FontWeight.w300,
-                            fontSize: screenWidth * Settings.FONT_SIZE_SMALL))
+                            fontSize: _width * Settings.FONT_SIZE_MEDIUM))
                   ],
                 )
               ],
