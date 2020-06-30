@@ -1,4 +1,6 @@
-class SpokenLanguage {
+import 'package:TMDB_Mobile/model/model.dart';
+
+class SpokenLanguage extends Model {
   String iso6391;
   String name;
 
