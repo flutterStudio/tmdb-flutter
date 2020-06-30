@@ -10,11 +10,9 @@ class MoviesListScreen extends StatefulWidget {
 
 class _MoviesListScreenState extends State<MoviesListScreen> {
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: NestedScrollView(
-            headerSliverBuilder: _headerSliverBuilder,
-            body: _sliverBuilderBody(context)),
-      );
+  Widget build(BuildContext context) => NestedScrollView(
+      headerSliverBuilder: _headerSliverBuilder,
+      body: _sliverBuilderBody(context));
 
   List<Widget> _headerSliverBuilder(
       BuildContext context, bool innerBoxScrolled) {

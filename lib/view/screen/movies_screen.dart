@@ -1,11 +1,14 @@
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/view/bloc/main_bloc.dart';
 import 'package:TMDB_Mobile/view/widget/item_movie_verical_view.dart';
 import 'package:TMDB_Mobile/view/widget/movie_rating_rectangular.dart';
 import 'package:TMDB_Mobile/view/widget/movies_slider_widget.dart';
 import 'package:TMDB_Mobile/view/widget/screen_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 class MoviesScreen extends StatefulWidget {
   @override
@@ -14,12 +17,29 @@ class MoviesScreen extends StatefulWidget {
 
 class _MoviesScreenState extends State<MoviesScreen> {
   ScrollController controller;
+  MainBloc _mainBloc;
 
   @override
   void initState() {
     controller = ScrollController();
     controller.addListener(() {
-      if (controller.position.userScrollDirection == ScrollDirection.forward) {}
+      // Listen to scrolling events
+      // If the user is scrolling down then hide the bottom navigation
+      if (controller.position.userScrollDirection == ScrollDirection.forward) {
+        if (!_mainBloc.isBottomNavigationUp) {
+          _mainBloc.showBottomNavigation();
+        }
+        // If the user is scrolling up then shpw the bottom navigation
+
+      } else {
+        if (_mainBloc.isBottomNavigationUp) {
+          _mainBloc.hideBottomNavigation();
+        }
+      }
+    });
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _mainBloc = context.read<MainBloc>();
     });
     super.initState();
   }

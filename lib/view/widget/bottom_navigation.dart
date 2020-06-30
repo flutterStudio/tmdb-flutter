@@ -1,6 +1,8 @@
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/view/bloc/main_bloc.dart';
 import 'package:TMDB_Mobile/view/widget/item_bottom_navigation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 class BottomNavigation extends StatefulWidget {
   final double _height;
@@ -21,21 +23,24 @@ class BottomNavigation extends StatefulWidget {
 }
 
 class _BottomNavigationState extends State<BottomNavigation>
-    with TickerProviderStateMixin, ChangeNotifier {
+    with TickerProviderStateMixin {
   @override
-  Widget build(BuildContext context) => Container(
-        height: widget._height,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(color: widget._background, boxShadow: [
-          BoxShadow(
-              color: Settings.COLOR_DARK_SHADOW,
-              blurRadius: 2,
-              offset: Offset(0, 2),
-              spreadRadius: 2)
-        ]),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: widget._items,
-        ),
-      );
+  Widget build(BuildContext context) => Consumer<MainBloc>(
+      builder: (context, mainBloc, staticWidget) => AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            height: mainBloc.isBottomNavigationUp ? widget._height : 0,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(color: widget._background, boxShadow: [
+              BoxShadow(
+                  color: Settings.COLOR_DARK_SHADOW,
+                  blurRadius: 2,
+                  offset: Offset(0, 2),
+                  spreadRadius: 2)
+            ]),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: widget._items,
+            ),
+          ));
 }

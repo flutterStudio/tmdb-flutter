@@ -24,14 +24,15 @@ class _SearchScreenState extends State<SearchScreen> {
         floating: true,
         snap: true,
         primary: true,
-        backgroundColor: Settings.COLOR_DARK_SECONDARY,
+        leading: Container(),
+        backgroundColor: Settings.COLOR_DARK_SHADOW,
         flexibleSpace: FlexibleSpaceBar(
             centerTitle: true,
             titlePadding: EdgeInsets.all(0),
             title: Container(
                 padding: EdgeInsets.only(top: screenWidth * 0.05),
                 decoration: BoxDecoration(
-                  color: Settings.COLOR_DARK_SECONDARY,
+                  color: Settings.COLOR_DARK_SHADOW,
                 ),
                 child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -42,7 +43,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           Icons.arrow_back,
                           color: Colors.white,
                         ),
-                        onPressed: null,
+                        onPressed: Navigator.of(context).pop,
                       ),
                       Expanded(
                           child: Container(
