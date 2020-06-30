@@ -8,7 +8,7 @@ class Settings {
   static const Color COLOR_DARK_SHADOW = Color(0XFF040F13);
   static const Color COLOR_DARK_TEXT = Color(0XFFFFFFFF);
 
-  // Font Size
+  // Font size
   static const double FONT_SIZE_EXTRA_LARGE_FACTOR = 0.08;
   static const double FONT_SIZE_LARGE = 0.07;
   static const double FONT_SIZE_MEDIUM = 0.06;
@@ -21,8 +21,26 @@ class Settings {
   static const double VERTICAL_SCREEN_SECTIONS_PADDING = 0.05;
   static const double HORIZONTAL_SCREEN_SECTIONS_PADDING = 0.05;
 
-  static const Widget VERTICAL_SCREEN_SPACER = SizedBox(
-    height: VERTICAL_SCREEN_SECTIONS_PADDING,
-    width: 10,
-  );
+  // TMDB api settings.
+  static const String TMDB_API_KEY = "aa49426d0fa8a9f0483b15a89d3657de";
+  static const String TMDB_API_BASE_URL = "https://api.themoviedb.org/3/";
+
+  // TMDB endpoints
+  static const Map<TmdbEndPoint, String> TMDB_ENDPOINTS = {
+    TmdbEndPoint.discoverMovies: "discover/movie",
+    TmdbEndPoint.discoverTv: "discover/tv",
+  };
+
+  // HTTP request state common codes an their meaning.
+  static const Map<int, String> HTTP_REQUEST_STATE_CODE = {
+    200: "Ok",
+    400: "BAD_REQUEST",
+    401: "UNAUTHORIZED",
+    403: "FORBIDDEN",
+    404: "NOT_FOUND",
+    408: "REQUEST_TIMEOUT",
+  };
 }
+
+/// TMDB endpoints
+enum TmdbEndPoint { discoverMovies, discoverTv }
