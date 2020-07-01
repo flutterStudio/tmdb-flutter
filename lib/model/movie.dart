@@ -45,7 +45,7 @@ class Movie extends Model {
     originalTitle = json['original_title'];
     genreIds = json['genre_ids'].cast<int>();
     title = json['title'];
-    voteAverage = json['vote_average'];
+    voteAverage = double.tryParse(json['vote_average'].toString());
     overview = json['overview'];
     releaseDate = json['release_date'];
   }
