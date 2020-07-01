@@ -29,6 +29,28 @@ class Settings {
   static const Map<TmdbEndPoint, String> TMDB_ENDPOINTS = {
     TmdbEndPoint.discoverMovies: "discover/movie",
     TmdbEndPoint.discoverTv: "discover/tv",
+    TmdbEndPoint.genreMovies: "genre/movie/list",
+    TmdbEndPoint.genreTv: "genre/tv/list",
+  };
+
+  // TMDB endpoint's options
+  static const Map<String, List<String>> TMDB_SORT_OPTIONS = {
+    "sort_by": [
+      "popularity.asc",
+      "popularity.desc",
+      "release_date.as",
+      "release_date.desc",
+      "revenue.asc",
+      "revenue.desc",
+      "primary_release_date.asc",
+      "primary_release_date.desc",
+      "original_title.asc",
+      "original_title.desc",
+      "vote_average.asc",
+      "vote_average.desc",
+      "vote_count.asc",
+      "vote_count.desc"
+    ],
   };
 
   // HTTP request state common codes an their meaning.
@@ -43,4 +65,6 @@ class Settings {
 }
 
 /// TMDB endpoints
-enum TmdbEndPoint { discoverMovies, discoverTv }
+enum TmdbEndPoint { discoverMovies, discoverTv, genreMovies, genreTv }
+
+/// TMDB Discover Options
