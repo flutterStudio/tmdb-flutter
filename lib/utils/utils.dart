@@ -1,4 +1,8 @@
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/model/model.dart';
+import 'dart:convert';
+
+import 'package:TMDB_Mobile/model/movie.dart';
 
 class Utils {
   static String generateTmdbRerquestUrl(
@@ -39,5 +43,14 @@ class Utils {
       listString.substring(1, listString.length - 1);
     }
     return listString;
+  }
+
+  /// Parses the given [json] string into the [result] out parameter of type [T].
+  static void parseObject<T extends Model>(String json, T result) async {
+    var jsonObject = jsonDecode(json);
+    T type;
+    if (type is Movie) {
+      result = Movie.fromJson(jsonObject) as T;
+    }
   }
 }
