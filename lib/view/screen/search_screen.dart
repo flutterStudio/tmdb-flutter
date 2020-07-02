@@ -1,4 +1,5 @@
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/view/widget/dialog_search_filter.dart';
 import 'package:TMDB_Mobile/view/widget/item_movie_stacked_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -107,7 +108,17 @@ class _SearchScreenState extends State<SearchScreen> {
                           Icons.filter_list,
                           color: Colors.white,
                         ),
-                        onPressed: null,
+                        onPressed: () => showDialog(
+                          builder: (context) => Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 30, horizontal: 5),
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                      Settings.GENERAL_BORDER_RADIUS),
+                                  child: SearchFilter())),
+                          context: context,
+                          // ,
+                        ),
                       ),
                     ]))),
       )
