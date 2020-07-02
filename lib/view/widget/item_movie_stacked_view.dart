@@ -32,7 +32,8 @@ class MovieStackedView extends StatelessWidget {
             color: Settings.COLOR_DARK_SECONDARY,
             image:
                 DecorationImage(fit: BoxFit.cover, image: AssetImage(_image)),
-            borderRadius: BorderRadius.circular(5)),
+            borderRadius:
+                BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS)),
       ),
       Positioned(
         bottom: 0,

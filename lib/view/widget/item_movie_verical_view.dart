@@ -21,7 +21,8 @@ class MovieVerticalView extends StatelessWidget {
                   child: Container(
                     height: screenHeight * 0.4,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius:
+                          BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS),
                       color: Colors.accents[id],
                     ),
                   )),

@@ -40,6 +40,13 @@ class Settings {
     404: "NOT_FOUND",
     408: "REQUEST_TIMEOUT",
   };
+  // Border Radius
+  static const double GENERAL_BORDER_RADIUS = 5;
+
+  static const Widget VERTICAL_SCREEN_SPACER = SizedBox(
+    height: VERTICAL_SCREEN_SECTIONS_PADDING,
+    width: 10,
+  );
 }
 
 /// TMDB endpoints
