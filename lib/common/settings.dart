@@ -21,6 +21,9 @@ class Settings {
   static const double VERTICAL_SCREEN_SECTIONS_PADDING = 0.05;
   static const double HORIZONTAL_SCREEN_SECTIONS_PADDING = 0.05;
 
+  // Border Radius
+  static const double GENERAL_BORDER_RADIUS = 5;
+
   static const Widget VERTICAL_SCREEN_SPACER = SizedBox(
     height: VERTICAL_SCREEN_SECTIONS_PADDING,
     width: 10,

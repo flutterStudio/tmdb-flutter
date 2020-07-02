@@ -100,7 +100,8 @@ class _MovieDetailsState extends State<MovieDetailsScreen>
                                   width: screenWidth * 0.4,
                                   height: screenHeight * 0.35,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
+                                    borderRadius: BorderRadius.circular(
+                                        Settings.GENERAL_BORDER_RADIUS),
                                     image: DecorationImage(
                                         image: AssetImage(
                                             "assets/placeholders/poster.jpg")),

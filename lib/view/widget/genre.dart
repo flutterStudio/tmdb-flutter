@@ -9,7 +9,7 @@ class Genre extends StatelessWidget {
   Widget build(BuildContext context) => Container(
       decoration: BoxDecoration(
           color: Settings.COLOR_DARK_HIGHLIGHT,
-          borderRadius: BorderRadius.circular(5)),
+          borderRadius: BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS)),
       padding: EdgeInsets.all(3),
       margin: EdgeInsets.all(2),
       child: Text(
