@@ -4,13 +4,32 @@ import 'package:flutter/widgets.dart';
 
 class Genre extends StatelessWidget {
   final String genre;
-  Genre(this.genre);
+  final Widget leading;
+  Genre(this.genre, {this.leading});
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => leading == null
+      ? _body(context)
+      : Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            SizedBox(
+                height: MediaQuery.of(context).size.width *
+                        Settings.FONT_SIZE_SMALL +
+                    20,
+                width: MediaQuery.of(context).size.width *
+                        Settings.FONT_SIZE_SMALL +
+                    10,
+                child: leading),
+            _body(context)
+          ],
+        );
+
+  Widget _body(BuildContext context) => Container(
       decoration: BoxDecoration(
           color: Settings.COLOR_DARK_HIGHLIGHT,
-          borderRadius: BorderRadius.circular(5)),
-      padding: EdgeInsets.all(3),
+          borderRadius: BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS)),
+      padding: EdgeInsets.all(4),
       margin: EdgeInsets.all(2),
       child: Text(
         genre,

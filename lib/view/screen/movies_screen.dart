@@ -109,8 +109,8 @@ class _MoviesScreenState extends State<MoviesScreen> {
                                           EdgeInsets.all(screenWidth * 0.02),
                                       decoration: BoxDecoration(
                                           color: Colors.accents[index],
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
+                                          borderRadius: BorderRadius.circular(
+                                              Settings.GENERAL_BORDER_RADIUS)),
                                     ),
                                     Positioned(
                                         bottom: screenHeight * 0.02,

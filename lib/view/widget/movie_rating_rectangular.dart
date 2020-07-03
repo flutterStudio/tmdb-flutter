@@ -11,7 +11,7 @@ class MovieRatingRectangular extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         padding: EdgeInsets.all(5),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS),
             color: Settings.COLOR_DARK_HIGHLIGHT),
         child: Row(
           mainAxisSize: MainAxisSize.min,

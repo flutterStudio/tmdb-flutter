@@ -13,7 +13,8 @@ class HorizontalMovieOptionsPanel extends StatelessWidget {
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
             color: Color.fromRGBO(12, 37, 46, 0.8),
-            borderRadius: BorderRadius.circular(5)),
+            borderRadius:
+                BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS)),
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
