@@ -197,22 +197,27 @@ class SearchFilterState extends State<SearchFilter>
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
                               _field(context, "1.5", (value) {}),
-                              _optionText("to",
-                                  screenWidth * Settings.FONT_SIZE_MEDIUM),
+                              _optionText(
+                                  ">", screenWidth * Settings.FONT_SIZE_MEDIUM),
                               _field(context, "3", (value) {}),
                             ],
                           )),
-                      _filterSection(
-                          context,
-                          "Year",
-                          Row(
+
+                      Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: screenHeight * 0.015),
+                          child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
-                              _field(context, "2000", (value) {}),
-                              _optionText("to",
+                              _optionText("Release Year",
                                   screenWidth * Settings.FONT_SIZE_MEDIUM),
-                              _field(context, "2018", (value) {}),
+                              Expanded(
+                                child: Container(),
+                              ),
+                              _field(context, "2000", (value) {}),
+                              SizedBox(
+                                width: screenWidth * 0.05,
+                              )
                             ],
                           )),
                       Padding(
@@ -294,7 +299,10 @@ class SearchFilterState extends State<SearchFilter>
 
   Widget _optionText(String text, double size) => Text(
         text,
-        style: TextStyle(fontSize: size, color: Settings.COLOR_DARK_TEXT),
+        style: TextStyle(
+            fontSize: size,
+            color: Settings.COLOR_DARK_TEXT,
+            fontWeight: FontWeight.w300),
       );
 
   Widget _filterSection(BuildContext context, String text, Widget child,
