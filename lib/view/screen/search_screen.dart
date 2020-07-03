@@ -111,7 +111,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         onPressed: () => showDialog(
                           builder: (context) => Container(
                               padding: EdgeInsets.symmetric(
-                                  vertical: 30, horizontal: 5),
+                                  vertical: 25, horizontal: 5),
                               child: ClipRRect(
                                   borderRadius: BorderRadius.circular(
                                       Settings.GENERAL_BORDER_RADIUS),

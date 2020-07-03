@@ -2,10 +2,10 @@ import 'package:TMDB_Mobile/common/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class Genre extends StatelessWidget {
+class GenreWidget extends StatelessWidget {
   final String genre;
   final Widget leading;
-  Genre(this.genre, {this.leading});
+  GenreWidget(this.genre, {this.leading});
   @override
   Widget build(BuildContext context) => leading == null
       ? _body(context)

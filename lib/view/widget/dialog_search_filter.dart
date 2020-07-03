@@ -1,5 +1,5 @@
 import 'package:TMDB_Mobile/common/settings.dart';
-import 'package:TMDB_Mobile/view/widget/genre.dart';
+import 'package:TMDB_Mobile/view/widget/genre_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -373,7 +373,7 @@ class SearchFilterState extends State<SearchFilter>
           ]));
 
   final List<Widget> _genres = [
-    Genre(
+    GenreWidget(
       "Science Fiction",
       leading: IconButton(
           icon: Icon(
