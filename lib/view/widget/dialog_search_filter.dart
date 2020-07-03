@@ -1,8 +1,11 @@
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/view/bloc/search_bloc.dart';
 import 'package:TMDB_Mobile/view/widget/genre_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 class SearchFilter extends StatefulWidget {
   @override
@@ -10,7 +13,7 @@ class SearchFilter extends StatefulWidget {
 }
 
 typedef OnfieldSubmit = void Function(dynamic value);
-typedef OnfieldEditFinished = void Function(dynamic value);
+typedef OnButtonCLick = void Function();
 
 class SearchFilterState extends State<SearchFilter>
     with SingleTickerProviderStateMixin {
@@ -23,6 +26,19 @@ class SearchFilterState extends State<SearchFilter>
       vsync: this,
       initialIndex: 0,
     );
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _tabController.addListener(() {
+        _tabController.index == 0
+            ? context.read<SearchBloc>().updateEndPoint(TmdbEndPoint.discoverTv)
+            : _tabController.index == 0
+                ? context
+                    .read<SearchBloc>()
+                    .updateEndPoint(TmdbEndPoint.discoverMovies)
+                : context.read<SearchBloc>().updateEndPoint(TmdbEndPoint.all);
+      });
+    });
+
     super.initState();
   }
 
@@ -35,7 +51,6 @@ class SearchFilterState extends State<SearchFilter>
         body: GestureDetector(
             onTap: () {
               FocusScopeNode currentFocus = FocusScope.of(context);
-
               if (!currentFocus.hasPrimaryFocus) {
                 currentFocus.unfocus();
               }
@@ -81,7 +96,17 @@ class SearchFilterState extends State<SearchFilter>
                                 color: Settings.COLOR_DARK_SHADOW,
                                 borderRadius:
                                     BorderRadius.circular(tabBarHeight)),
-                            tabs: [Text("TV"), Text("Movies"), Text("All")],
+                            tabs: [
+                              Tab(
+                                child: Text("TV"),
+                              ),
+                              Tab(
+                                child: Text("Movies"),
+                              ),
+                              Tab(
+                                child: Text("All"),
+                              ),
+                            ],
                           )),
                       // Sort by.
                       Padding(
@@ -93,31 +118,23 @@ class SearchFilterState extends State<SearchFilter>
                               _optionText("Sort By",
                                   screenWidth * Settings.FONT_SIZE_MEDIUM),
                               DropdownButton(
-                                items: [
-                                  DropdownMenuItem(
-                                      child: _dropDownButon(
-                                          text: "Popularity",
-                                          color: Settings.COLOR_DARK_TEXT,
-                                          background:
-                                              Settings.COLOR_DARK_SECONDARY,
-                                          border:
-                                              Settings.COLOR_DARK_HIGHLIGHT)),
-                                  DropdownMenuItem(
-                                      child: _dropDownButon(
-                                          text: "Popularity",
-                                          color: Settings.COLOR_DARK_TEXT,
-                                          background:
-                                              Settings.COLOR_DARK_SECONDARY,
-                                          border:
-                                              Settings.COLOR_DARK_HIGHLIGHT)),
-                                ],
+                                items: Settings.TMDB_SORT_OPTIONS["sort_by"]
+                                    .map((e) => DropdownMenuItem(
+                                        child: _dropDownButon(
+                                            text: e,
+                                            color: Settings.COLOR_DARK_TEXT,
+                                            background:
+                                                Settings.COLOR_DARK_SECONDARY,
+                                            border:
+                                                Settings.COLOR_DARK_HIGHLIGHT)))
+                                    .toList(),
                                 autofocus: false,
                                 onChanged: (value) {
                                   FocusScope.of(context).unfocus(
                                       disposition: UnfocusDisposition
                                           .previouslyFocusedChild);
                                 },
-                                itemHeight: screenHeight * 0.08,
+                                // itemHeight: screenHeight * 0.08,
                                 iconDisabledColor:
                                     Settings.COLOR_DARK_SECONDARY,
                                 icon: Container(),
@@ -145,23 +162,49 @@ class SearchFilterState extends State<SearchFilter>
                       _filterSection(
                           context,
                           "Rating",
-                          Row(children: [
-                            _optionText(
-                                "2.0", screenWidth * Settings.FONT_SIZE_SMALL),
-                            Expanded(
-                                child: RangeSlider(
-                              values: RangeValues(2.0, 8.0),
-                              onChanged: (RangeValues values) {},
-                              activeColor: Settings.COLOR_DARK_HIGHLIGHT,
-                              inactiveColor: Settings.COLOR_DARK_SHADOW,
-                              labels: RangeLabels("0.2", "8.0"),
-                              divisions: 10,
-                              min: 0.0,
-                              max: 10,
-                            )),
-                            _optionText(
-                                "8.0", screenWidth * Settings.FONT_SIZE_SMALL),
-                          ])),
+                          Consumer<SearchBloc>(
+                              builder: (context, bloc, __) => Row(children: [
+                                    Expanded(
+                                        flex: 2,
+                                        child: _optionText(
+                                            " ${bloc.ratingLow.toStringAsFixed(1)}",
+                                            screenWidth *
+                                                Settings.FONT_SIZE_SMALL)),
+                                    Expanded(
+                                        flex: 14,
+                                        child: RangeSlider(
+                                          values: RangeValues(
+                                              bloc.ratingLow, bloc.ratinghigh),
+                                          onChanged: (RangeValues values) {
+                                            context
+                                                .read<SearchBloc>()
+                                                .updateRating(
+                                                    values.start, values.end);
+                                          },
+                                          activeColor:
+                                              Settings.COLOR_DARK_HIGHLIGHT,
+                                          inactiveColor:
+                                              Settings.COLOR_DARK_SHADOW,
+                                          labels: RangeLabels(
+                                              context
+                                                  .select((SearchBloc bloc) =>
+                                                      bloc.ratingLow)
+                                                  .toStringAsFixed(1),
+                                              context
+                                                  .select((SearchBloc bloc) =>
+                                                      bloc.ratinghigh)
+                                                  .toStringAsFixed(1)),
+                                          divisions: 100,
+                                          min: 0.0,
+                                          max: 10,
+                                        )),
+                                    Expanded(
+                                        flex: 2,
+                                        child: _optionText(
+                                            " ${bloc.ratinghigh.toStringAsFixed(1)}",
+                                            screenWidth *
+                                                Settings.FONT_SIZE_SMALL)),
+                                  ]))),
                       _filterSection(
                           context,
                           "With Genres",
@@ -175,20 +218,56 @@ class SearchFilterState extends State<SearchFilter>
                                 borderRadius: BorderRadius.circular(
                                     Settings.GENERAL_BORDER_RADIUS),
                                 color: Settings.COLOR_DARK_SECONDARY),
-                            child: Wrap(
-                              alignment: WrapAlignment.start,
-                              runSpacing: 0,
-                              spacing: 0,
-                              children: _genres,
-                            ),
+                            child: Consumer<SearchBloc>(
+                                builder: (context, bloc, _) => Wrap(
+                                      alignment: WrapAlignment.start,
+                                      runSpacing: 0,
+                                      spacing: 0,
+                                      children: bloc.genres
+                                          .map((e) => GenreWidget(
+                                                e,
+                                                leading: IconButton(
+                                                    icon: Icon(
+                                                      Icons.close,
+                                                      color: Colors.white,
+                                                      size: 15,
+                                                    ),
+                                                    onPressed: () =>
+                                                        bloc.removeGenre(e.id)),
+                                              ))
+                                          .toList(),
+                                    )),
                           ),
-                          action: IconButton(
-                              icon: Icon(
-                                Icons.add_circle,
-                                color: Settings.COLOR_DARK_HIGHLIGHT,
-                                size: screenWidth * 0.1,
-                              ),
-                              onPressed: null)),
+                          action: PopupMenuButton<int>(
+                            color: Settings.COLOR_DARK_PRIMARY,
+                            icon: Icon(
+                              Icons.add_circle,
+                              color: Settings.COLOR_DARK_HIGHLIGHT,
+                              size: screenWidth * 0.1,
+                            ),
+                            onSelected: (int item) {
+                              context.read<SearchBloc>().genres.length >
+                                      Settings.MAX_GENRES_PER_FILTER
+                                  ? Scaffold.of(context).showSnackBar(SnackBar(
+                                      content: Text("Sending Message"),
+                                    ))
+                                  : context.read<SearchBloc>().addGenre(item);
+                            },
+                            itemBuilder: (context) => context
+                                .read<SearchBloc>()
+                                .genres
+                                .map((e) => CheckedPopupMenuItem<int>(
+                                      child: Text(
+                                        e.name,
+                                        style: TextStyle(
+                                            color: Settings.COLOR_DARK_TEXT,
+                                            fontSize: screenWidth *
+                                                Settings.FONT_SIZE_SMALL),
+                                      ),
+                                      value: e.id,
+                                    ))
+                                .toList(),
+                          )),
                       _filterSection(
                           context,
                           "Runtime (hours)",
@@ -226,67 +305,25 @@ class SearchFilterState extends State<SearchFilter>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                        screenWidth * 0.5),
-                                    color: Settings.COLOR_DARK_SECONDARY),
-                                child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Icon(
-                                        Icons.refresh,
-                                        size: 20,
-                                        color: Colors.white,
-                                      ),
-                                      SizedBox(
-                                        width: screenWidth * 0.02,
-                                      ),
-                                      Text(
-                                        "Reset",
-                                        style: TextStyle(
-                                            color: Settings.COLOR_DARK_TEXT),
-                                      ),
-                                      SizedBox(
-                                        width: screenWidth * 0.02,
-                                      ),
-                                    ]),
-                              ),
+                              _button(
+                                  "Reset",
+                                  context,
+                                  Icons.refresh,
+                                  Colors.white,
+                                  Settings.COLOR_DARK_SECONDARY,
+                                  () {}),
                               SizedBox(
                                 width: screenWidth * 0.05,
                               ),
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                        screenWidth * 0.5),
-                                    color: Settings.COLOR_DARK_HIGHLIGHT),
-                                child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Icon(
-                                        Icons.check_circle,
-                                        size: 20,
-                                        color: Colors.white,
-                                      ),
-                                      SizedBox(
-                                        width: screenWidth * 0.02,
-                                      ),
-                                      Text(
-                                        "Confirm",
-                                        style: TextStyle(
-                                            color: Settings.COLOR_DARK_TEXT),
-                                      ),
-                                      SizedBox(
-                                        width: screenWidth * 0.02,
-                                      ),
-                                    ]),
-                              )
+                              _button(
+                                  "Confirm",
+                                  context,
+                                  Icons.check_circle,
+                                  Colors.white,
+                                  Settings.COLOR_DARK_HIGHLIGHT, () {
+                                context.read<SearchBloc>().applyFilter();
+                                Navigator.pop(context);
+                              })
                             ],
                           )),
                       SizedBox(
@@ -380,19 +417,6 @@ class SearchFilterState extends State<SearchFilter>
                 )),
           ]));
 
-  final List<Widget> _genres = [
-    GenreWidget(
-      "Science Fiction",
-      leading: IconButton(
-          icon: Icon(
-            Icons.close,
-            color: Colors.white,
-            size: 15,
-          ),
-          onPressed: null),
-    ),
-  ];
-
   Widget _dropDownButon(
           {String text, Color border, Color background, Color color}) =>
       Container(
@@ -407,4 +431,36 @@ class SearchFilterState extends State<SearchFilter>
             borderRadius:
                 BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS)),
       );
+
+  Widget _button(String text, BuildContext context, IconData icon,
+          Color iconColor, Color backgraound, OnButtonCLick onClick) =>
+      GestureDetector(
+          onTap: onClick,
+          child: Container(
+            padding: EdgeInsets.all(10),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(
+                    MediaQuery.of(context).size.width * 0.5),
+                color: backgraound),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Icon(
+                    icon,
+                    size: 20,
+                    color: iconColor,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.02,
+                  ),
+                  Text(
+                    text,
+                    style: TextStyle(color: Settings.COLOR_DARK_TEXT),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.02,
+                  ),
+                ]),
+          ));
 }

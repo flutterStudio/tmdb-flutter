@@ -1,9 +1,10 @@
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/model/genre.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class GenreWidget extends StatelessWidget {
-  final String genre;
+  final Genre genre;
   final Widget leading;
   GenreWidget(this.genre, {this.leading});
   @override
@@ -32,7 +33,7 @@ class GenreWidget extends StatelessWidget {
       padding: EdgeInsets.all(4),
       margin: EdgeInsets.all(2),
       child: Text(
-        genre,
+        genre.name,
         softWrap: true,
         overflow: TextOverflow.clip,
         style: TextStyle(

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/model/genre.dart';
 import 'package:TMDB_Mobile/view/widget/actors_horizontal_list.dart';
 import 'package:TMDB_Mobile/view/widget/genre_widget.dart';
 import 'package:TMDB_Mobile/view/widget/horizontal_movie_options.dart';
@@ -188,9 +189,8 @@ class _MovieDetailsState extends State<MovieDetailsScreen>
                                           crossAxisAlignment:
                                               WrapCrossAlignment.center,
                                           children: <Widget>[
-                                            GenreWidget("Science Ficition"),
-                                            GenreWidget("Drama"),
-                                            GenreWidget("Horror"),
+                                            GenreWidget(
+                                                Genre(1, "Science Ficition")),
                                           ],
                                         ),
                                         Expanded(child: Container())

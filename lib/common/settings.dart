@@ -53,25 +53,6 @@ class Settings {
     ],
   };
 
-  // TMDB endpoint's options
-  static const Map<String, List<String>> TMDB_DISCOVER_FILTERS = {
-    "sort_by": [
-      "popularity.asc",
-      "popularity.desc",
-      "release_date.as",
-      "release_date.desc",
-      "revenue.asc",
-      "revenue.desc",
-      "primary_release_date.asc",
-      "primary_release_date.desc",
-      "original_title.asc",
-      "original_title.desc",
-      "vote_average.asc",
-      "vote_average.desc",
-      "vote_count.asc",
-      "vote_count.desc"
-    ],
-  };
   // HTTP request state common codes an their meaning.
   static const Map<int, String> HTTP_REQUEST_STATE_CODE = {
     200: "Ok",
@@ -88,9 +69,20 @@ class Settings {
     height: VERTICAL_SCREEN_SECTIONS_PADDING,
     width: 10,
   );
+
+  static const int MAX_YEAR = 3000;
+  static const int MIN_YEAR = 0;
+
+  static const double MAX_MOVIE_RUNTIME = 100;
+  static const double MIN_MOVIE_RUNTIME = 0.0;
+
+  static const double MAX_RATING = 10.0;
+  static const double MIN_RATING = 0.0;
+
+  static const int MAX_GENRES_PER_FILTER = 4;
 }
 
 /// TMDB endpoints
-enum TmdbEndPoint { discoverMovies, discoverTv, genreMovies, genreTv }
+enum TmdbEndPoint { discoverMovies, discoverTv, genreMovies, genreTv, all }
 
 /// TMDB Discover Options
