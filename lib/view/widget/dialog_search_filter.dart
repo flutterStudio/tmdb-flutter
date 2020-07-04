@@ -1,4 +1,6 @@
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/model/genre.dart';
+import 'package:TMDB_Mobile/utils/utils.dart';
 import 'package:TMDB_Mobile/view/bloc/search_bloc.dart';
 import 'package:TMDB_Mobile/view/widget/genre_widget.dart';
 import 'package:flutter/material.dart';
@@ -31,12 +33,20 @@ class SearchFilterState extends State<SearchFilter>
       _tabController.addListener(() {
         _tabController.index == 0
             ? context.read<SearchBloc>().updateEndPoint(TmdbEndPoint.discoverTv)
-            : _tabController.index == 0
+            : _tabController.index == 1
                 ? context
                     .read<SearchBloc>()
                     .updateEndPoint(TmdbEndPoint.discoverMovies)
                 : context.read<SearchBloc>().updateEndPoint(TmdbEndPoint.all);
       });
+
+      _tabController.animateTo(
+          context.read<SearchBloc>().tmdbEndPoint == TmdbEndPoint.discoverTv
+              ? 0
+              : context.read<SearchBloc>().tmdbEndPoint ==
+                      TmdbEndPoint.discoverMovies
+                  ? 1
+                  : 2);
     });
 
     super.initState();
@@ -44,6 +54,7 @@ class SearchFilterState extends State<SearchFilter>
 
   @override
   Widget build(BuildContext context) {
+    final SearchBloc searchBloc = Provider.of<SearchBloc>(context);
     final double tabBarHeight = MediaQuery.of(context).size.height * 0.07;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -82,6 +93,7 @@ class SearchFilterState extends State<SearchFilter>
                                 fontSize:
                                     screenWidth * Settings.FONT_SIZE_LARGE),
                           )),
+                      // Tabbar
                       Container(
                           height: tabBarHeight,
                           decoration: BoxDecoration(
@@ -117,48 +129,66 @@ class SearchFilterState extends State<SearchFilter>
                             children: <Widget>[
                               _optionText("Sort By",
                                   screenWidth * Settings.FONT_SIZE_MEDIUM),
-                              DropdownButton(
-                                items: Settings.TMDB_SORT_OPTIONS["sort_by"]
-                                    .map((e) => DropdownMenuItem(
-                                        child: _dropDownButon(
-                                            text: e,
-                                            color: Settings.COLOR_DARK_TEXT,
+                              Expanded(
+                                flex: 10,
+                                child: Container(),
+                              ),
+                              Consumer<SearchBloc>(
+                                  builder: (context, bloc, __) =>
+                                      DropdownButton(
+                                        items: Settings
+                                            .TMDB_SORT_OPTIONS["sort_by"]
+                                            .map((e) => DropdownMenuItem(
+                                                value: e,
+                                                child: _dropDownButon(
+                                                    text: e,
+                                                    color: Settings
+                                                        .COLOR_DARK_TEXT,
+                                                    background: Settings
+                                                        .COLOR_DARK_SECONDARY,
+                                                    border: Settings
+                                                        .COLOR_DARK_HIGHLIGHT)))
+                                            .toList(),
+                                        autofocus: false,
+                                        value: bloc.sortBy.isEmpty
+                                            ? Settings
+                                                .TMDB_SORT_OPTIONS["sort_by"]
+                                                .elementAt(0)
+                                            : bloc.sortBy,
+                                        onChanged: bloc.tmdbEndPoint ==
+                                                TmdbEndPoint.all
+                                            ? null
+                                            : (value) {
+                                                bloc.changeSortBy(value);
+                                              },
+                                        iconDisabledColor:
+                                            Settings.COLOR_DARK_SECONDARY,
+                                        icon: Container(),
+                                        hint: _dropDownButon(
+                                            text: "Select an option",
+                                            color: Settings.COLOR_DARK_TEXT
+                                                .withOpacity(0.5),
                                             background:
                                                 Settings.COLOR_DARK_SECONDARY,
-                                            border:
-                                                Settings.COLOR_DARK_HIGHLIGHT)))
-                                    .toList(),
-                                autofocus: false,
-                                onChanged: (value) {
-                                  FocusScope.of(context).unfocus(
-                                      disposition: UnfocusDisposition
-                                          .previouslyFocusedChild);
-                                },
-                                // itemHeight: screenHeight * 0.08,
-                                iconDisabledColor:
-                                    Settings.COLOR_DARK_SECONDARY,
-                                icon: Container(),
-                                hint: _dropDownButon(
-                                    text: "Popularity",
-                                    color: Settings.COLOR_DARK_TEXT
-                                        .withOpacity(0.5),
-                                    background: Settings.COLOR_DARK_SECONDARY,
-                                    border: Settings.COLOR_DARK_SHADOW),
-                                dropdownColor: Settings.COLOR_DARK_SECONDARY,
-                                disabledHint: _dropDownButon(
-                                    text: "Popularity",
-                                    color: Settings.COLOR_DARK_TEXT
-                                        .withOpacity(0.5),
-                                    background: Settings.COLOR_DARK_SECONDARY,
-                                    border: Settings.COLOR_DARK_SHADOW),
-                                underline: Container(),
-                                style: TextStyle(
-                                    color: Settings.COLOR_DARK_TEXT,
-                                    fontWeight: FontWeight.w600),
-                                onTap: () {},
-                              ),
+                                            border: Settings.COLOR_DARK_SHADOW),
+                                        dropdownColor:
+                                            Settings.COLOR_DARK_SECONDARY,
+                                        disabledHint: _dropDownButon(
+                                            text: "Select an option",
+                                            color: Settings.COLOR_DARK_TEXT
+                                                .withOpacity(0.5),
+                                            background:
+                                                Settings.COLOR_DARK_SECONDARY,
+                                            border: Settings.COLOR_DARK_SHADOW),
+                                        underline: Container(),
+                                        style: TextStyle(
+                                            color: Settings.COLOR_DARK_TEXT,
+                                            fontWeight: FontWeight.w600),
+                                        onTap: () {},
+                                      )),
                             ],
                           )),
+                      // Rating Slider
                       _filterSection(
                           context,
                           "Rating",
@@ -175,12 +205,16 @@ class SearchFilterState extends State<SearchFilter>
                                         child: RangeSlider(
                                           values: RangeValues(
                                               bloc.ratingLow, bloc.ratinghigh),
-                                          onChanged: (RangeValues values) {
-                                            context
-                                                .read<SearchBloc>()
-                                                .updateRating(
-                                                    values.start, values.end);
-                                          },
+                                          onChanged: bloc.tmdbEndPoint ==
+                                                  TmdbEndPoint.all
+                                              ? null
+                                              : (RangeValues values) {
+                                                  context
+                                                      .read<SearchBloc>()
+                                                      .updateRating(
+                                                          values.start,
+                                                          values.end);
+                                                },
                                           activeColor:
                                               Settings.COLOR_DARK_HIGHLIGHT,
                                           inactiveColor:
@@ -194,7 +228,7 @@ class SearchFilterState extends State<SearchFilter>
                                                   .select((SearchBloc bloc) =>
                                                       bloc.ratinghigh)
                                                   .toStringAsFixed(1)),
-                                          divisions: 100,
+                                          // divisions: 100,
                                           min: 0.0,
                                           max: 10,
                                         )),
@@ -205,6 +239,70 @@ class SearchFilterState extends State<SearchFilter>
                                             screenWidth *
                                                 Settings.FONT_SIZE_SMALL)),
                                   ]))),
+                      // Runtime Slider
+                      _filterSection(
+                          context,
+                          "Runtime (hours)",
+                          Consumer<SearchBloc>(
+                              builder: (context, bloc, __) => Row(children: [
+                                    Expanded(
+                                        flex: 2,
+                                        child: _optionText(
+                                            " ${bloc.runtimeLow.toStringAsFixed(0)}",
+                                            screenWidth *
+                                                Settings.FONT_SIZE_SMALL)),
+                                    Expanded(
+                                        flex: 14,
+                                        child: RangeSlider(
+                                          values: RangeValues(bloc.runtimeLow,
+                                              bloc.runtimeHigh),
+                                          onChanged: bloc.tmdbEndPoint ==
+                                                  TmdbEndPoint.all
+                                              ? null
+                                              : (RangeValues values) {
+                                                  bloc.updateRunTime(
+                                                      values.start, values.end);
+                                                },
+                                          activeColor:
+                                              Settings.COLOR_DARK_HIGHLIGHT,
+                                          inactiveColor:
+                                              Settings.COLOR_DARK_SHADOW,
+                                          labels: RangeLabels(
+                                              bloc.runtimeLow
+                                                  .toStringAsFixed(0),
+                                              bloc.runtimeHigh
+                                                  .toStringAsFixed(0)),
+                                          min: Settings.MIN_MOVIE_RUNTIME,
+                                          max: Settings.MAX_MOVIE_RUNTIME,
+                                        )),
+                                    Expanded(
+                                        flex: 2,
+                                        child: _optionText(
+                                            " ${bloc.runtimeHigh.toStringAsFixed(0)}",
+                                            screenWidth *
+                                                Settings.FONT_SIZE_SMALL)),
+                                  ]))),
+                      Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: screenHeight * 0.015),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              _optionText("Release Year",
+                                  screenWidth * Settings.FONT_SIZE_MEDIUM),
+                              Expanded(
+                                child: Container(),
+                              ),
+                              _field(context, "2000", (value) {},
+                                  enabled: searchBloc.tmdbEndPoint ==
+                                          TmdbEndPoint.all
+                                      ? false
+                                      : true),
+                              SizedBox(
+                                width: screenWidth * 0.05,
+                              )
+                            ],
+                          )),
                       _filterSection(
                           context,
                           "With Genres",
@@ -218,87 +316,98 @@ class SearchFilterState extends State<SearchFilter>
                                 borderRadius: BorderRadius.circular(
                                     Settings.GENERAL_BORDER_RADIUS),
                                 color: Settings.COLOR_DARK_SECONDARY),
-                            child: Consumer<SearchBloc>(
-                                builder: (context, bloc, _) => Wrap(
-                                      alignment: WrapAlignment.start,
-                                      runSpacing: 0,
-                                      spacing: 0,
-                                      children: bloc.genres
-                                          .map((e) => GenreWidget(
-                                                e,
-                                                leading: IconButton(
-                                                    icon: Icon(
-                                                      Icons.close,
-                                                      color: Colors.white,
-                                                      size: 15,
-                                                    ),
-                                                    onPressed: () =>
-                                                        bloc.removeGenre(e.id)),
-                                              ))
-                                          .toList(),
-                                    )),
+                            child: StreamBuilder<Map<Genre, bool>>(
+                                stream: searchBloc.genresStream,
+                                builder: (context,
+                                        AsyncSnapshot<Map<Genre, bool>> data) =>
+                                    data.hasData && data.data.length > 0
+                                        ? Wrap(
+                                            alignment: WrapAlignment.start,
+                                            runSpacing: 0,
+                                            spacing: 0,
+                                            children:
+                                                _extractGenriesList(data.data))
+                                        : Container()),
                           ),
-                          action: PopupMenuButton<int>(
-                            color: Settings.COLOR_DARK_PRIMARY,
-                            icon: Icon(
-                              Icons.add_circle,
-                              color: Settings.COLOR_DARK_HIGHLIGHT,
-                              size: screenWidth * 0.1,
-                            ),
-                            onSelected: (int item) {
-                              context.read<SearchBloc>().genres.length >
-                                      Settings.MAX_GENRES_PER_FILTER
-                                  ? Scaffold.of(context).showSnackBar(SnackBar(
-                                      content: Text("Sending Message"),
-                                    ))
-                                  : context.read<SearchBloc>().addGenre(item);
-                            },
-                            itemBuilder: (context) => context
-                                .read<SearchBloc>()
-                                .genres
-                                .map((e) => CheckedPopupMenuItem<int>(
-                                      child: Text(
-                                        e.name,
-                                        style: TextStyle(
-                                            color: Settings.COLOR_DARK_TEXT,
-                                            fontSize: screenWidth *
-                                                Settings.FONT_SIZE_SMALL),
-                                      ),
-                                      value: e.id,
-                                    ))
-                                .toList(),
-                          )),
-                      _filterSection(
-                          context,
-                          "Runtime (hours)",
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <Widget>[
-                              _field(context, "1.5", (value) {}),
-                              _optionText(
-                                  ">", screenWidth * Settings.FONT_SIZE_MEDIUM),
-                              _field(context, "3", (value) {}),
-                            ],
-                          )),
+                          action: searchBloc.tmdbEndPoint == TmdbEndPoint.all
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.add_circle,
+                                    color: Settings.COLOR_DARK_SECONDARY,
+                                    size: screenWidth * 0.1,
+                                  ),
+                                  onPressed: null,
+                                )
+                              : IconButton(
+                                  icon: Icon(
+                                    Icons.add_circle,
+                                    color: Settings.COLOR_DARK_HIGHLIGHT,
+                                    size: screenWidth * 0.1,
+                                  ),
+                                  onPressed: () {
+                                    searchBloc.getGenres();
+                                    Utils.showCustomDialog(
+                                        context,
+                                        Settings.COLOR_DARK_PRIMARY,
+                                        Settings.GENERAL_BORDER_RADIUS,
+                                        StreamBuilder<Map<Genre, bool>>(
+                                            stream: context
+                                                .read<SearchBloc>()
+                                                .genresStream,
+                                            builder: (context,
+                                                    AsyncSnapshot<Map<Genre, bool>>
+                                                        data) =>
+                                                data.hasError || !data.hasData
+                                                    ? Container()
+                                                    : Container(
+                                                        color: Settings
+                                                            .COLOR_DARK_PRIMARY,
+                                                        width:
+                                                            screenWidth * 0.4,
+                                                        height:
+                                                            screenHeight * 0.5,
+                                                        child: Scaffold(
+                                                            body: data.hasData &&
+                                                                    data.data.length > 0
+                                                                ? ListView.builder(
+                                                                    itemCount: data.data.length,
+                                                                    itemBuilder: (context, index) => Container(
+                                                                        color: Settings.COLOR_DARK_PRIMARY,
+                                                                        child: CheckboxListTile(
+                                                                          title:
+                                                                              Text(
+                                                                            data.data.keys.elementAt(index).name,
+                                                                            style:
+                                                                                TextStyle(color: Settings.COLOR_DARK_TEXT),
+                                                                          ),
+                                                                          activeColor:
+                                                                              Settings.COLOR_DARK_SECONDARY,
+                                                                          selected: data
+                                                                              .data
+                                                                              .values
+                                                                              .elementAt(index),
+                                                                          checkColor:
+                                                                              Settings.COLOR_DARK_HIGHLIGHT,
+                                                                          value: data
+                                                                              .data
+                                                                              .values
+                                                                              .elementAt(index),
+                                                                          onChanged:
+                                                                              (bool value) {
+                                                                            int checkedGenresCount =
+                                                                                data.data.values.where((element) => element == true).length;
+                                                                            if (value &&
+                                                                                checkedGenresCount >= 4) {
+                                                                              Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: Settings.COLOR_DARK_SECONDARY, content: Text("You can not add mmore than 4 genres")));
+                                                                            } else {
+                                                                              data.data[data.data.keys.elementAt(index)] = value;
+                                                                              searchBloc.updateGenre(data.data.keys.elementAt(index), value);
+                                                                            }
+                                                                          },
+                                                                        )))
+                                                                : Text("Loading Genres...")))));
+                                  })),
 
-                      Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: screenHeight * 0.015),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              _optionText("Release Year",
-                                  screenWidth * Settings.FONT_SIZE_MEDIUM),
-                              Expanded(
-                                child: Container(),
-                              ),
-                              _field(context, "2000", (value) {}),
-                              SizedBox(
-                                width: screenWidth * 0.05,
-                              )
-                            ],
-                          )),
                       Padding(
                           padding: EdgeInsets.symmetric(
                               vertical: screenHeight * 0.015),
@@ -310,8 +419,9 @@ class SearchFilterState extends State<SearchFilter>
                                   context,
                                   Icons.refresh,
                                   Colors.white,
-                                  Settings.COLOR_DARK_SECONDARY,
-                                  () {}),
+                                  Settings.COLOR_DARK_SECONDARY, () {
+                                searchBloc.reset();
+                              }),
                               SizedBox(
                                 width: screenWidth * 0.05,
                               ),
@@ -321,7 +431,7 @@ class SearchFilterState extends State<SearchFilter>
                                   Icons.check_circle,
                                   Colors.white,
                                   Settings.COLOR_DARK_HIGHLIGHT, () {
-                                context.read<SearchBloc>().applyFilter();
+                                searchBloc.applyFilter();
                                 Navigator.pop(context);
                               })
                             ],
@@ -370,7 +480,7 @@ class SearchFilterState extends State<SearchFilter>
   }
 
   Widget _field(BuildContext context, String hint, OnfieldSubmit onSubmit,
-          {FocusNode focusNode}) =>
+          {FocusNode focusNode, bool enabled = true}) =>
       Container(
           width: MediaQuery.of(context).size.width * 0.3,
           height: MediaQuery.of(context).size.height * 0.05,
@@ -386,17 +496,12 @@ class SearchFilterState extends State<SearchFilter>
                 height: MediaQuery.of(context).size.height * 0.05,
                 child: TextField(
                   maxLines: 1,
+                  enabled: enabled,
                   autofocus: false,
-                  onEditingComplete: () {
-                    if (focusNode != null) {
-                      focusNode.unfocus();
-                    }
-                  },
+                  onEditingComplete: enabled ? () {} : null,
                   textAlignVertical: TextAlignVertical.center,
-                  onSubmitted: onSubmit,
-                  onChanged: (value) {
-                    print(value);
-                  },
+                  onSubmitted: enabled ? onSubmit : null,
+                  onChanged: enabled ? (value) {} : null,
                   enableInteractiveSelection: false,
                   style: TextStyle(color: Settings.COLOR_DARK_TEXT),
                   keyboardType: TextInputType.number,
@@ -463,4 +568,22 @@ class SearchFilterState extends State<SearchFilter>
                   ),
                 ]),
           ));
+
+  List<Widget> _extractGenriesList(Map<Genre, bool> genres) {
+    List<Widget> result = [];
+    genres.forEach((key, value) {
+      value
+          ? result.add(GenreWidget(key,
+              leading: IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 15,
+                  ),
+                  onPressed: () =>
+                      context.read<SearchBloc>().updateGenre(key, false))))
+          : Container();
+    });
+    return result;
+  }
 }

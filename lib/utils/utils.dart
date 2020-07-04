@@ -3,6 +3,8 @@ import 'package:TMDB_Mobile/model/model.dart';
 import 'dart:convert';
 
 import 'package:TMDB_Mobile/model/movie.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class Utils {
   static String generateTmdbRerquestUrl(
@@ -18,7 +20,7 @@ class Utils {
   static String _generateOptionsString(Map<String, dynamic> options) {
     String optionsString = "";
 
-    if (options.length > 0) {
+    if (options != null) {
       for (int i = 0; i < options.length; i++) {
         String value = "";
         if (options.values.elementAt(i) is List) {
@@ -53,4 +55,15 @@ class Utils {
       result = Movie.fromJson(jsonObject) as T;
     }
   }
+
+  static void showCustomDialog(BuildContext context, Color background,
+          double radius, Widget child) =>
+      showDialog(
+        builder: (context) => Container(
+            padding: EdgeInsets.symmetric(vertical: 70, horizontal: 5),
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(radius), child: child)),
+        context: context,
+        // ,
+      );
 }

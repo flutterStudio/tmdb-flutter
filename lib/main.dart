@@ -1,11 +1,12 @@
+import 'package:TMDB_Mobile/repository/main_repository.dart';
 import 'package:TMDB_Mobile/view/bloc/main_bloc.dart';
 import 'package:TMDB_Mobile/view/bloc/search_bloc.dart';
 import 'package:TMDB_Mobile/view/screen/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
 
 void main() {
+  MainRepository().initData();
   runApp(MyApp());
 }
 
