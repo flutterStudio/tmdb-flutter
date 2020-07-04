@@ -179,7 +179,9 @@ class SearchBloc extends Bloc with ChangeNotifier {
       }
       // Add year value.
       if (year > Settings.MIN_YEAR) {
-        options["with_runtime.gte"] = year;
+        tmdbEndPoint == TmdbEndPoint.discoverMovies
+            ? options["year"] = year
+            : options["first_air_date_year"] = year;
       }
     }
     return options;
