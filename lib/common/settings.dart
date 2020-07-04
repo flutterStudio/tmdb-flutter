@@ -24,7 +24,7 @@ class Settings {
   // TMDB api settings.
   static const String TMDB_API_KEY = "aa49426d0fa8a9f0483b15a89d3657de";
   static const String TMDB_API_BASE_URL = "https://api.themoviedb.org/3/";
-
+  static const String TMDB_API_IMAGE_URL = "https://image.tmdb.org/t/p/";
   // TMDB endpoints
   static const Map<TmdbEndPoint, String> TMDB_ENDPOINTS = {
     TmdbEndPoint.discoverMovies: "discover/movie",
@@ -62,6 +62,14 @@ class Settings {
     404: "NOT_FOUND",
     408: "REQUEST_TIMEOUT",
   };
+
+  // HTTP request state common codes an their meaning.
+  static const Map<TmdbImagesSizes, String> TMDB_IMAGES_SIZES = {
+    TmdbImagesSizes.original: "original",
+    TmdbImagesSizes.w300: "w300",
+    TmdbImagesSizes.w500: "w500",
+  };
+
   // Border Radius
   static const double GENERAL_BORDER_RADIUS = 5;
 
@@ -85,4 +93,5 @@ class Settings {
 /// TMDB endpoints
 enum TmdbEndPoint { discoverMovies, discoverTv, genreMovies, genreTv, all }
 
-/// TMDB Discover Options
+/// TMDB Images sizes
+enum TmdbImagesSizes { original, w500, w300 }
