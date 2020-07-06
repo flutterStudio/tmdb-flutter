@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:TMDB_Mobile/common/settings.dart';
 import 'package:TMDB_Mobile/model/movie.dart';
 import 'package:TMDB_Mobile/model/tvshow_model.dart';
+import 'package:TMDB_Mobile/view/screen/details_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -15,6 +16,7 @@ class ItemStackedView extends StatelessWidget {
   final bool _offline;
   final String _image;
   final TvShow _tvShow;
+  final String _heroTag;
 
   ItemStackedView.movie({
     double width,
@@ -26,6 +28,7 @@ class ItemStackedView extends StatelessWidget {
         _height = height,
         _width = width,
         _offline = offline,
+        _heroTag = "heroMovie" + movie.id.toString(),
         _image = movie.posterPath,
         _tvShow = null,
         _highlight = highlight,
@@ -43,6 +46,7 @@ class ItemStackedView extends StatelessWidget {
         _height = height,
         _width = width,
         _image = tvShow.posterPath,
+        _heroTag = "heroTv" + tvShow.id.toString(),
         _tvShow = tvShow,
         _offline = offline,
         _highlight = highlight,
@@ -62,35 +66,52 @@ class ItemStackedView extends StatelessWidget {
             borderRadius:
                 BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS)),
       ),
-      ClipRRect(
-          borderRadius: BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS),
-          child: _offline || _image == null
-              ? Center(
-                  child: Icon(
-                  Icons.error,
-                  color: _highlight,
-                ))
-              : SizedBox.expand(
-                  child: CachedNetworkImage(
-                  fit: BoxFit.fill,
-                  placeholder: (context, _) =>
-                      Image.asset("assets/placeholders/poster.jpg"),
-                  imageUrl:
-                      "${Settings.TMDB_API_IMAGE_URL}w300${_movie != null ? _movie.posterPath : _tvShow.posterPath}",
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      Center(
-                          child: SizedBox(
-                              width: _width * 0.2,
-                              height: _width * 0.2,
-                              child: Center(
-                                  child: CircularProgressIndicator(
-                                      value: downloadProgress.progress)))),
-                  errorWidget: (context, url, error) => Center(
-                      child: Icon(
-                    Icons.error,
-                    color: Settings.COLOR_DARK_HIGHLIGHT,
-                  )),
-                ))),
+      _offline || _image == null
+          ? Center(
+              child: Icon(
+              Icons.error,
+              color: _highlight,
+            ))
+          : SizedBox(
+              width: _width,
+              height: _height,
+              child: Hero(
+                  tag: _heroTag,
+                  createRectTween: (begin, end) =>
+                      MaterialRectCenterArcTween(begin: begin, end: end),
+                  transitionOnUserGestures: true,
+                  child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                          onTap: () {
+                            if (_movie != null || _tvShow != null) {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => _movie != null
+                                      ? DetailsScreen.movie(movie: _movie)
+                                      : DetailsScreen.tvShow(tvShow: _tvShow)));
+                            }
+                          },
+                          child: CachedNetworkImage(
+                            fit: BoxFit.fill,
+                            placeholder: (context, _) =>
+                                Image.asset("assets/placeholders/poster.jpg"),
+                            imageUrl:
+                                "${Settings.TMDB_API_IMAGE_URL}w300${_movie != null ? _movie.posterPath : _tvShow.posterPath}",
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) => Center(
+                                    child: SizedBox(
+                                        width: _width * 0.2,
+                                        height: _width * 0.2,
+                                        child: Center(
+                                            child: CircularProgressIndicator(
+                                                value: downloadProgress
+                                                    .progress)))),
+                            errorWidget: (context, url, error) => Center(
+                                child: Icon(
+                              Icons.error,
+                              color: Settings.COLOR_DARK_HIGHLIGHT,
+                            )),
+                          ))))),
       Positioned(
           left: _width * 0.02,
           bottom: _height * 0.02,

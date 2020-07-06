@@ -10,23 +10,29 @@ import 'package:TMDB_Mobile/view/widget/horizontal_movie_options.dart';
 import 'package:TMDB_Mobile/view/widget/item_movie_verical_view.dart';
 import 'package:TMDB_Mobile/view/widget/parental_guide_.dart';
 import 'package:TMDB_Mobile/view/widget/screen_section.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class DetailsScreen extends StatefulWidget {
   final Movie _movie;
   final TvShow _tvShow;
-
+  final String _heroTag;
+  final bool _isMovie;
   DetailsScreen.movie({
     @required Movie movie,
   })  : _movie = movie,
         _tvShow = null,
+        _isMovie = true,
+        _heroTag = "heroMovie" + movie.id.toString(),
         assert(movie != null);
 
   DetailsScreen.tvShow({
     @required TvShow tvShow,
   })  : _movie = null,
+        _isMovie = false,
         _tvShow = tvShow,
+        _heroTag = "heroTv" + tvShow.id.toString(),
         assert(tvShow != null);
   @override
   _MovieDetailsState createState() => _MovieDetailsState();
@@ -60,13 +66,30 @@ class _MovieDetailsState extends State<DetailsScreen>
                     vertical: screenWidth * Settings.VERTICAL_SCREEN_PADDING),
                 child: Stack(
                   children: <Widget>[
+                    // Background Image
                     Container(
                       height: screenHeight * 1.4,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: AssetImage(
-                                  "assets/placeholders/poster.jpg"))),
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        placeholder: (context, _) =>
+                            Image.asset("assets/placeholders/poster.jpg"),
+                        imageUrl:
+                            "${Settings.TMDB_API_IMAGE_URL}w300${widget._isMovie ? widget._movie.posterPath : widget._tvShow.posterPath}",
+                        progressIndicatorBuilder:
+                            (context, url, downloadProgress) => Center(
+                                child: SizedBox(
+                                    width: screenWidth * 0.2,
+                                    height: screenWidth * 0.2,
+                                    child: Center(
+                                        child: CircularProgressIndicator(
+                                            value:
+                                                downloadProgress.progress)))),
+                        errorWidget: (context, url, error) => Center(
+                            child: Icon(
+                          Icons.error,
+                          color: Settings.COLOR_DARK_HIGHLIGHT,
+                        )),
+                      ),
                     ),
                     Container(
                         height: screenHeight * 1.4,
@@ -98,7 +121,10 @@ class _MovieDetailsState extends State<DetailsScreen>
                                 Settings.VERTICAL_SCREEN_SECTIONS_PADDING,
                           ),
                           Text(
-                            "MOVIE NAME",
+                            widget._isMovie
+                                ? widget._movie.title
+                                : widget._tvShow.name,
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Settings.COLOR_DARK_TEXT,
                                 fontWeight: FontWeight.w400,
@@ -113,16 +139,43 @@ class _MovieDetailsState extends State<DetailsScreen>
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
-                              Container(
+                              // Poster
+                              SizedBox(
                                   width: screenWidth * 0.4,
                                   height: screenHeight * 0.35,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                        Settings.GENERAL_BORDER_RADIUS),
-                                    image: DecorationImage(
-                                        image: AssetImage(
-                                            "assets/placeholders/poster.jpg")),
-                                  )),
+                                  child: Hero(
+                                      tag: widget._heroTag,
+                                      child: Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                              child: CachedNetworkImage(
+                                            fit: BoxFit.fill,
+                                            placeholder: (context, _) =>
+                                                Image.asset(
+                                                    "assets/placeholders/poster.jpg"),
+                                            imageUrl:
+                                                "${Settings.TMDB_API_IMAGE_URL}w300${widget._isMovie ? widget._movie.posterPath : widget._tvShow.posterPath}",
+                                            progressIndicatorBuilder: (context,
+                                                    url, downloadProgress) =>
+                                                Center(
+                                                    child: SizedBox(
+                                                        width:
+                                                            screenWidth * 0.2,
+                                                        height:
+                                                            screenWidth * 0.2,
+                                                        child: Center(
+                                                            child: CircularProgressIndicator(
+                                                                value: downloadProgress
+                                                                    .progress)))),
+                                            errorWidget:
+                                                (context, url, error) => Center(
+                                                    child: Icon(
+                                              Icons.error,
+                                              color:
+                                                  Settings.COLOR_DARK_HIGHLIGHT,
+                                            )),
+                                          ))))),
+                              // info Section
                               Container(
                                   width: screenWidth * 0.5,
                                   height: screenHeight * 0.3,
@@ -220,13 +273,19 @@ class _MovieDetailsState extends State<DetailsScreen>
                           Padding(
                             padding: EdgeInsets.all(screenHeight * 0.01),
                             child: HorizontalMovieOptionsPanel(
-                                _animationController),
+                              _animationController,
+                              value: widget._isMovie
+                                  ? widget._movie.voteAverage
+                                  : widget._tvShow.voteAverage,
+                            ),
                           ),
                           ScreenSection(
                             background: Colors.transparent,
                             title: "Overview",
                             body: Text(
-                              "The near future, a time when both hope and hardships drive humanity to look to the stars and beyond. While a mysterious phenomenon menaces to destroy life on planet Earth, astronaut Roy McBride undertakes a mission across the immensity of space and its many perils to uncover the truth about a lost expedition that decades before boldly faced emptiness and silence in search of the unknown.",
+                              widget._isMovie
+                                  ? widget._movie.overview
+                                  : widget._tvShow.overview,
                               style: TextStyle(
                                   color: Settings.COLOR_DARK_TEXT,
                                   fontWeight: FontWeight.w300,
@@ -234,7 +293,6 @@ class _MovieDetailsState extends State<DetailsScreen>
                                       screenWidth * Settings.FONT_SIZE_SMALL),
                             ),
                           ),
-                          // Tv Show
                           ScreenSection(
                             background: Colors.transparent,
                             title: "Cast",

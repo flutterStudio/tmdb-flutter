@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 
 class HorizontalMovieOptionsPanel extends StatelessWidget {
   final AnimationController animationController;
+  final double _value;
 
-  HorizontalMovieOptionsPanel(this.animationController);
+  HorizontalMovieOptionsPanel(this.animationController, {value = 0})
+      : _value = value * 0.1;
   @override
   Widget build(BuildContext context) => Container(
         alignment: Alignment.center,
@@ -19,7 +21,7 @@ class HorizontalMovieOptionsPanel extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            CircularRating(0.5, MediaQuery.of(context).size.width * 0.15,
+            CircularRating(_value, MediaQuery.of(context).size.width * 0.15,
                 animationController),
             IconButton(
               icon: Icon(

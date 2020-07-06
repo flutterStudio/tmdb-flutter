@@ -42,7 +42,7 @@ class CircularRating extends StatelessWidget {
                     Settings.COLOR_DARK_HIGHLIGHT),
               ),
               Text(
-                "${valueAnimation.value.toStringAsFixed(1)}",
+                "${(valueAnimation.value * 10).toStringAsFixed(1)}",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: Settings.COLOR_DARK_TEXT,
