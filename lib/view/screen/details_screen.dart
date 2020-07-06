@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:TMDB_Mobile/common/settings.dart';
 import 'package:TMDB_Mobile/model/genre.dart';
+import 'package:TMDB_Mobile/model/movie.dart';
+import 'package:TMDB_Mobile/model/tvshow_model.dart';
 import 'package:TMDB_Mobile/view/widget/actors_horizontal_list.dart';
 import 'package:TMDB_Mobile/view/widget/genre_widget.dart';
 import 'package:TMDB_Mobile/view/widget/horizontal_movie_options.dart';
@@ -11,12 +13,26 @@ import 'package:TMDB_Mobile/view/widget/screen_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class MovieDetailsScreen extends StatefulWidget {
+class DetailsScreen extends StatefulWidget {
+  final Movie _movie;
+  final TvShow _tvShow;
+
+  DetailsScreen.movie({
+    @required Movie movie,
+  })  : _movie = movie,
+        _tvShow = null,
+        assert(movie != null);
+
+  DetailsScreen.tvShow({
+    @required TvShow tvShow,
+  })  : _movie = null,
+        _tvShow = tvShow,
+        assert(tvShow != null);
   @override
   _MovieDetailsState createState() => _MovieDetailsState();
 }
 
-class _MovieDetailsState extends State<MovieDetailsScreen>
+class _MovieDetailsState extends State<DetailsScreen>
     with SingleTickerProviderStateMixin {
   AnimationController _animationController;
 
@@ -218,6 +234,7 @@ class _MovieDetailsState extends State<MovieDetailsScreen>
                                       screenWidth * Settings.FONT_SIZE_SMALL),
                             ),
                           ),
+                          // Tv Show
                           ScreenSection(
                             background: Colors.transparent,
                             title: "Cast",

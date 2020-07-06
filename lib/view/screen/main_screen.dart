@@ -1,5 +1,4 @@
 import 'package:TMDB_Mobile/view/bloc/main_bloc.dart';
-import 'package:TMDB_Mobile/view/screen/movie_details_screen.dart';
 import 'package:TMDB_Mobile/view/screen/movies_list_screen.dart';
 import 'package:TMDB_Mobile/view/screen/movies_screen.dart';
 import 'package:TMDB_Mobile/view/screen/search_screen.dart';
@@ -28,7 +27,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   children: <Widget>[
                     MoviesScreen(),
                     MoviesListScreen(),
-                    MovieDetailsScreen()
                   ],
                 )),
         bottomNavigationBar: BottomNavigation(

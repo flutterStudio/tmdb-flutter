@@ -3,7 +3,7 @@ import 'package:TMDB_Mobile/model/movie.dart';
 import 'package:TMDB_Mobile/utils/data.dart';
 import 'package:TMDB_Mobile/view/bloc/search_bloc.dart';
 import 'package:TMDB_Mobile/view/widget/dialog_search_filter.dart';
-import 'package:TMDB_Mobile/view/widget/item_movie_stacked_view.dart';
+import 'package:TMDB_Mobile/view/widget/item_stacked_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -225,7 +225,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           childAspectRatio: 0.6),
                       itemBuilder: (context, index) => snapshot.data
                               is Data<List<Movie>>
-                          ? MovieStackedView.movie(
+                          ? ItemStackedView.movie(
                               offline: false,
                               movie: snapshot.data.data[index],
                               width: MediaQuery.of(context).size.width * 0.5,
@@ -234,7 +234,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   ? Settings.COLOR_DARK_PRIMARY
                                   : Settings.COLOR_DARK_HIGHLIGHT,
                             )
-                          : MovieStackedView.tv(
+                          : ItemStackedView.tv(
                               offline: false,
                               tvShow: snapshot.data.data[index],
                               width: MediaQuery.of(context).size.width * 0.5,

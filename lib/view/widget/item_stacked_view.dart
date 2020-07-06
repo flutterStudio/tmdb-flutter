@@ -7,7 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class MovieStackedView extends StatelessWidget {
+class ItemStackedView extends StatelessWidget {
   final double _width;
   final double _height;
   final Movie _movie;
@@ -16,7 +16,7 @@ class MovieStackedView extends StatelessWidget {
   final String _image;
   final TvShow _tvShow;
 
-  MovieStackedView.movie({
+  ItemStackedView.movie({
     double width,
     double height,
     Movie movie,
@@ -33,7 +33,7 @@ class MovieStackedView extends StatelessWidget {
         assert(height != null),
         assert(width != null);
 
-  MovieStackedView.tv({
+  ItemStackedView.tv({
     double width,
     double height,
     TvShow tvShow,
