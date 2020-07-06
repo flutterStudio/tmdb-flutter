@@ -1,84 +1,104 @@
 import 'dart:ui';
 
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/model/movie.dart';
+import 'package:TMDB_Mobile/model/tvshow_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class MovieStackedView extends StatelessWidget {
   final double _width;
   final double _height;
-  final String _image;
-  final String _name;
+  final Movie _movie;
   final Color _highlight;
+  final bool _offline;
+  final String _image;
+  final TvShow _tvShow;
 
-  MovieStackedView(
-      {double width, double height, String name, String image, Color highlight})
-      : _image = image,
+  MovieStackedView.movie({
+    double width,
+    double height,
+    Movie movie,
+    Color highlight = Settings.COLOR_DARK_HIGHLIGHT,
+    bool offline = true,
+  })  : _movie = movie,
         _height = height,
         _width = width,
-        _name = name,
+        _offline = offline,
+        _image = movie.posterPath,
+        _tvShow = null,
         _highlight = highlight,
-        assert(image != null),
+        assert(movie != null),
         assert(height != null),
-        assert(width != null),
-        assert(name != null);
+        assert(width != null);
+
+  MovieStackedView.tv({
+    double width,
+    double height,
+    TvShow tvShow,
+    Color highlight = Settings.COLOR_DARK_HIGHLIGHT,
+    bool offline = true,
+  })  : _movie = null,
+        _height = height,
+        _width = width,
+        _image = tvShow.posterPath,
+        _tvShow = tvShow,
+        _offline = offline,
+        _highlight = highlight,
+        assert(tvShow != null),
+        assert(height != null),
+        assert(width != null);
 
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
       Container(
-        width: _width,
-        height: _height,
+        // width: _width,
+        // height: _height
+        padding: EdgeInsets.zero,
         decoration: BoxDecoration(
             color: Settings.COLOR_DARK_SECONDARY,
-            image:
-                DecorationImage(fit: BoxFit.cover, image: AssetImage(_image)),
             borderRadius:
                 BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS)),
       ),
+      ClipRRect(
+          borderRadius: BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS),
+          child: _offline || _image == null
+              ? Center(
+                  child: Icon(
+                  Icons.error,
+                  color: _highlight,
+                ))
+              : SizedBox.expand(
+                  child: CachedNetworkImage(
+                  fit: BoxFit.fill,
+                  placeholder: (context, _) =>
+                      Image.asset("assets/placeholders/poster.jpg"),
+                  imageUrl:
+                      "${Settings.TMDB_API_IMAGE_URL}w300${_movie != null ? _movie.posterPath : _tvShow.posterPath}",
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      Center(
+                          child: SizedBox(
+                              width: _width * 0.2,
+                              height: _width * 0.2,
+                              child: Center(
+                                  child: CircularProgressIndicator(
+                                      value: downloadProgress.progress)))),
+                  errorWidget: (context, url, error) => Center(
+                      child: Icon(
+                    Icons.error,
+                    color: Settings.COLOR_DARK_HIGHLIGHT,
+                  )),
+                ))),
       Positioned(
-        bottom: 0,
-        width: _width,
-        height: _height * 0.25,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(),
+          left: _width * 0.02,
+          bottom: _height * 0.02,
           child: Container(
-            padding: EdgeInsets.symmetric(
-                vertical: _height * 0.02, horizontal: _width * 0.05),
-            width: _width,
-            height: _height * 0.25,
-            color: _highlight.withOpacity(0.7),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Text(_name,
-                    maxLines: 1,
-                    style: TextStyle(
-                        color: Settings.COLOR_DARK_TEXT,
-                        fontWeight: FontWeight.w300,
-                        fontSize:
-                            _width * Settings.FONT_SIZE_EXTRA_LARGE_FACTOR)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text("Oct 10, 2012",
-                        style: TextStyle(
-                            color: Settings.COLOR_DARK_TEXT,
-                            fontWeight: FontWeight.w300,
-                            fontSize: _width * Settings.FONT_SIZE_MEDIUM)),
-                    Text("Rating",
-                        style: TextStyle(
-                            color: Settings.COLOR_DARK_TEXT,
-                            fontWeight: FontWeight.w300,
-                            fontSize: _width * Settings.FONT_SIZE_MEDIUM))
-                  ],
-                )
-              ],
-            ),
-          ),
-        ),
-      )
+            color: Settings.COLOR_DARK_HIGHLIGHT,
+            padding: EdgeInsets.all(2),
+            child: Text(_movie != null ? "movie" : "Tv"),
+          ))
     ]);
   }
 }

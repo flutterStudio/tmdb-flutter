@@ -29,6 +29,9 @@ class Settings {
   static const Map<TmdbEndPoint, String> TMDB_ENDPOINTS = {
     TmdbEndPoint.discoverMovies: "discover/movie",
     TmdbEndPoint.discoverTv: "discover/tv",
+    TmdbEndPoint.searchMovies: "search/movie",
+    TmdbEndPoint.searchTv: "search/tv",
+    TmdbEndPoint.searchMulti: "/search/multi",
     TmdbEndPoint.genreMovies: "genre/movie/list",
     TmdbEndPoint.genreTv: "genre/tv/list",
   };
@@ -91,7 +94,27 @@ class Settings {
 }
 
 /// TMDB endpoints
-enum TmdbEndPoint { discoverMovies, discoverTv, genreMovies, genreTv, all }
+enum TmdbEndPoint {
+  discoverTv,
+  discoverMovies,
+  searchTv,
+  searchMovies,
+  genreMovies,
+  genreTv,
+  searchMulti,
+}
 
 /// TMDB Images sizes
 enum TmdbImagesSizes { original, w500, w300 }
+
+/// Data Status
+enum DataStatus {
+  loading, // Still loading, show a spining icon..
+  complete, // Finished with any value..
+  faild, // An error has happened
+}
+
+enum RequestType {
+  fetch, // Fetch new content.
+  fetchMore, // Fetch the next page.
+}

@@ -1,5 +1,8 @@
 import 'package:TMDB_Mobile/model/genre.dart';
+import 'package:TMDB_Mobile/model/movie.dart';
+import 'package:TMDB_Mobile/model/tvshow_model.dart';
 import 'package:TMDB_Mobile/repository/main_repository.dart';
+import 'package:TMDB_Mobile/utils/data.dart';
 import 'package:TMDB_Mobile/view/bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:TMDB_Mobile/common/settings.dart';
@@ -10,13 +13,72 @@ class SearchBloc extends Bloc with ChangeNotifier {
   String sortBy;
   double ratingLow;
   double ratinghigh;
+  // Ssearch query.
+  String query;
+  // If true, search field will be disables,
+  // but you will have more filter options.
+  bool searchEnabled;
+  int page;
   Map<Genre, bool> _tvGenres;
   Map<Genre, bool> _movieGenres;
+
+  // Discovered movies.
+  List<Movie> discoveredMovies;
+  // Discovered tv shows.
+  List<TvShow> discoveredTvShows;
+
+  // movies search result.
+  List<Movie> moviesSearchResult;
+  // tv shows search result.
+  List<TvShow> tvShowsSrearchResult;
+
   BehaviorSubject<Map<Genre, bool>> _tvGenresStreamController;
   BehaviorSubject<Map<Genre, bool>> _movieGenresStreamController;
+  BehaviorSubject<Data<List<Movie>>> _discoverMovieStreamController;
+  BehaviorSubject<Data<List<TvShow>>> _discoverTvShowStreamController;
+
+  BehaviorSubject<Data<List<Movie>>> _searchMovieStreamController;
+  BehaviorSubject<Data<List<TvShow>>> _searchTvShowStreamController;
+
+  BehaviorSubject<dynamic> _searchStreamController;
+
   double runtimeLow;
   double runtimeHigh;
   int year;
+
+  SearchBloc() {
+    tmdbEndPoint = TmdbEndPoint.discoverMovies;
+    sortBy = "";
+    page = 0;
+    query = "";
+    ratingLow = Settings.MIN_RATING;
+    ratinghigh = Settings.MAX_RATING;
+    _tvGenres = {};
+    _movieGenres = {};
+
+    discoveredMovies = [];
+    discoveredTvShows = [];
+
+    moviesSearchResult = [];
+    tvShowsSrearchResult = [];
+
+    _initGenres();
+    _tvGenresStreamController = BehaviorSubject<Map<Genre, bool>>();
+    _movieGenresStreamController = BehaviorSubject<Map<Genre, bool>>();
+
+    _discoverMovieStreamController = BehaviorSubject<Data<List<Movie>>>();
+    _discoverTvShowStreamController = BehaviorSubject<Data<List<TvShow>>>();
+
+    _searchMovieStreamController = BehaviorSubject<Data<List<Movie>>>();
+    _searchTvShowStreamController = BehaviorSubject<Data<List<TvShow>>>();
+
+    _searchStreamController = BehaviorSubject<dynamic>();
+
+    runtimeLow = Settings.MIN_MOVIE_RUNTIME;
+    runtimeHigh = Settings.MAX_MOVIE_RUNTIME;
+    year = Settings.MIN_YEAR;
+    searchEnabled = false;
+  }
 
   Stream<Map<Genre, bool>> get genresStream =>
       tmdbEndPoint == TmdbEndPoint.discoverTv
@@ -25,20 +87,14 @@ class SearchBloc extends Bloc with ChangeNotifier {
               ? _movieGenresStreamController.stream
               : null;
 
-  SearchBloc() {
-    tmdbEndPoint = TmdbEndPoint.discoverMovies;
-    sortBy = "";
-    ratingLow = Settings.MIN_RATING;
-    ratinghigh = Settings.MAX_RATING;
-    _tvGenres = {};
-    _movieGenres = {};
-    _initGenres();
-    _tvGenresStreamController = BehaviorSubject<Map<Genre, bool>>();
-    _movieGenresStreamController = BehaviorSubject<Map<Genre, bool>>();
-    runtimeLow = Settings.MIN_MOVIE_RUNTIME;
-    runtimeHigh = Settings.MAX_MOVIE_RUNTIME;
-    year = Settings.MIN_YEAR;
-  }
+  Stream<dynamic> get searchStreams =>
+      tmdbEndPoint == TmdbEndPoint.discoverMovies
+          ? _discoverMovieStreamController.stream
+          : tmdbEndPoint == TmdbEndPoint.searchMovies
+              ? _searchMovieStreamController.stream
+              : tmdbEndPoint == TmdbEndPoint.discoverTv
+                  ? _discoverTvShowStreamController.stream
+                  : _searchTvShowStreamController;
 
   /// Updates [sortBy] value in [SearchBloc] and updates ui listeners.
   void changeSortBy(String sortByValue) {
@@ -150,16 +206,55 @@ class SearchBloc extends Bloc with ChangeNotifier {
   void updateEndPoint(TmdbEndPoint endpoint) {
     if (tmdbEndPoint != endpoint) {
       tmdbEndPoint = endpoint;
+      if (tmdbEndPoint == TmdbEndPoint.searchTv ||
+          tmdbEndPoint == TmdbEndPoint.searchMovies) {
+        searchEnabled = true;
+      } else {
+        searchEnabled = false;
+      }
       notifyListeners();
+    }
+  }
+
+  /// Update query text [value].
+  void updateQuery(String value) {
+    query = value;
+
+    if (value.isNotEmpty) {
+      searchEnabled = true;
+    } else {
+      searchEnabled = false;
     }
   }
 
   /// Returns search options as a Map of String, dynamic .
   Map<String, dynamic> applyFilter() {
     Map<String, dynamic> options = {};
+    options["include_adult"] = true;
+    if (searchEnabled) {
+      if (query.isNotEmpty) {
+        options["query"] = query;
+      }
+      if (year > Settings.MIN_YEAR) {
+        options[tmdbEndPoint == TmdbEndPoint.discoverMovies
+            ? "primary_release_year"
+            : "first_air_date_year"] = year;
+      }
 
-    if (tmdbEndPoint == TmdbEndPoint.all) {
+      if (tmdbEndPoint == TmdbEndPoint.discoverMovies) {
+        tmdbEndPoint = TmdbEndPoint.searchMovies;
+        searchEnabled = true;
+      }
+      if (tmdbEndPoint == TmdbEndPoint.discoverTv) {
+        tmdbEndPoint = TmdbEndPoint.searchTv;
+      }
     } else {
+      if (tmdbEndPoint == TmdbEndPoint.searchMovies) {
+        tmdbEndPoint = TmdbEndPoint.discoverMovies;
+      }
+      if (tmdbEndPoint == TmdbEndPoint.searchTv) {
+        tmdbEndPoint = TmdbEndPoint.discoverTv;
+      }
       if (sortBy.isNotEmpty) {
         options["sort_by"] = sortBy;
       }
@@ -179,11 +274,34 @@ class SearchBloc extends Bloc with ChangeNotifier {
       }
       // Add year value.
       if (year > Settings.MIN_YEAR) {
-        tmdbEndPoint == TmdbEndPoint.discoverMovies
-            ? options["year"] = year
-            : options["first_air_date_year"] = year;
+        options[tmdbEndPoint == TmdbEndPoint.discoverMovies
+            ? "primary_release_year"
+            : "first_air_date_year"] = year;
+      }
+      if (tmdbEndPoint == TmdbEndPoint.discoverMovies) {
+        List<int> genres = [];
+        _movieGenres.forEach((key, value) {
+          if (value) {
+            genres.add(key.id);
+          }
+        });
+        if (genres.length > 0) {
+          options["with_genres"] = genres;
+        }
+      }
+      if (tmdbEndPoint == TmdbEndPoint.discoverTv) {
+        List<int> genres = [];
+        _tvGenres.forEach((key, value) {
+          if (value) {
+            genres.add(key.id);
+          }
+        });
+        if (genres.length > 0) {
+          options["with_genres"] = genres;
+        }
       }
     }
+    notifyListeners();
     return options;
   }
 
@@ -192,17 +310,109 @@ class SearchBloc extends Bloc with ChangeNotifier {
     tmdbEndPoint = TmdbEndPoint.discoverMovies;
     sortBy = "";
     ratingLow = Settings.MIN_RATING;
-    ratinghigh = Settings.MIN_RATING;
+    ratinghigh = Settings.MAX_RATING;
     runtimeLow = Settings.MIN_MOVIE_RUNTIME;
     runtimeHigh = Settings.MAX_MOVIE_RUNTIME;
     year = Settings.MIN_YEAR;
     notifyListeners();
   }
 
+  /// Gets movies list.
+  Future<void> search(
+    RequestType requestType,
+  ) async {
+    var options = applyFilter();
+    if (requestType == RequestType.fetchMore) {
+      options["page"] = page + 1;
+    }
+    switch (tmdbEndPoint) {
+      case TmdbEndPoint.discoverMovies:
+        {
+          if (requestType == RequestType.fetch) {
+            _discoverMovieStreamController.sink
+                .add(Data<List<Movie>>.loading());
+          }
+
+          var data = await MainRepository().getMovies(tmdbEndPoint,
+              options: options, requestType: requestType);
+          requestType == RequestType.fetch && data.status == DataStatus.complete
+              ? discoveredMovies = data.data
+              : discoveredMovies.addAll(data.data);
+          page = data.page;
+          data.data = discoveredMovies;
+
+          _discoverMovieStreamController.sink.add(data);
+
+          break;
+        }
+      case TmdbEndPoint.searchMovies:
+        {
+          if (requestType == RequestType.fetch) {
+            _searchMovieStreamController.sink.add(Data<List<Movie>>.loading());
+          }
+
+          var data = await MainRepository().getMovies(tmdbEndPoint,
+              options: options, requestType: requestType);
+          requestType == RequestType.fetch && data.status == DataStatus.complete
+              ? moviesSearchResult = data.data
+              : moviesSearchResult.addAll(data.data);
+          page = data.page;
+          data.data = moviesSearchResult;
+
+          _searchMovieStreamController.sink.add(data);
+          notifyListeners();
+          break;
+        }
+      case TmdbEndPoint.discoverTv:
+        {
+          if (requestType == RequestType.fetch) {
+            _discoverTvShowStreamController.sink
+                .add(Data<List<TvShow>>.loading());
+          }
+          var data = await MainRepository().getTvShows(tmdbEndPoint,
+              options: options, requestType: requestType);
+          requestType == RequestType.fetch
+              ? discoveredTvShows = data.data
+              : discoveredTvShows.addAll(data.data);
+          // current page
+          page = data.page;
+          data.data = discoveredTvShows;
+          _discoverTvShowStreamController.add(data);
+          break;
+        }
+      case TmdbEndPoint.searchTv:
+        {
+          if (requestType == RequestType.fetch) {
+            _searchTvShowStreamController.sink
+                .add(Data<List<TvShow>>.loading());
+          }
+          var data = await MainRepository().getTvShows(tmdbEndPoint,
+              options: options, requestType: requestType);
+          requestType == RequestType.fetch
+              ? tvShowsSrearchResult = data.data
+              : tvShowsSrearchResult.addAll(data.data);
+          // current page
+          page = data.page;
+          data.data = tvShowsSrearchResult;
+          _searchTvShowStreamController.add(data);
+          notifyListeners();
+          break;
+        }
+
+      default:
+    }
+  }
+
   @override
   void dispose() {
     _tvGenresStreamController.close();
     _movieGenresStreamController.close();
+    _discoverMovieStreamController.close();
+    _discoverTvShowStreamController.close();
+    _searchStreamController.close();
+
+    _searchMovieStreamController.close();
+    _searchTvShowStreamController.close();
     super.dispose();
   }
 }

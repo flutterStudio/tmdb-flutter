@@ -24,29 +24,45 @@ class SearchFilterState extends State<SearchFilter>
   @override
   void initState() {
     _tabController = TabController(
-      length: 3,
+      length: 4,
       vsync: this,
       initialIndex: 0,
     );
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
+      SearchBloc bloc = context.read<SearchBloc>();
+
+      // Endpoint Tab bar (movies or tv)
       _tabController.addListener(() {
-        _tabController.index == 0
-            ? context.read<SearchBloc>().updateEndPoint(TmdbEndPoint.discoverTv)
-            : _tabController.index == 1
-                ? context
-                    .read<SearchBloc>()
-                    .updateEndPoint(TmdbEndPoint.discoverMovies)
-                : context.read<SearchBloc>().updateEndPoint(TmdbEndPoint.all);
+        switch (_tabController.index) {
+          case 0:
+            {
+              bloc.updateEndPoint(TmdbEndPoint.discoverTv);
+              break;
+            }
+          case 1:
+            {
+              bloc.updateEndPoint(TmdbEndPoint.discoverMovies);
+
+              break;
+            }
+          case 2:
+            {
+              bloc.updateEndPoint(TmdbEndPoint.searchTv);
+
+              break;
+            }
+          case 3:
+            {
+              bloc.updateEndPoint(TmdbEndPoint.searchMovies);
+
+              break;
+            }
+        }
       });
 
-      _tabController.animateTo(
-          context.read<SearchBloc>().tmdbEndPoint == TmdbEndPoint.discoverTv
-              ? 0
-              : context.read<SearchBloc>().tmdbEndPoint ==
-                      TmdbEndPoint.discoverMovies
-                  ? 1
-                  : 2);
+      //  Initialize tabbars.
+      _tabController.animateTo(bloc.tmdbEndPoint.index);
     });
 
     super.initState();
@@ -96,11 +112,13 @@ class SearchFilterState extends State<SearchFilter>
                       // Tabbar
                       Container(
                           height: tabBarHeight,
+                          // color: Settings.COLOR_DARK_SECONDARY,
                           decoration: BoxDecoration(
                               color: Settings.COLOR_DARK_SECONDARY,
                               borderRadius:
                                   BorderRadius.circular(tabBarHeight)),
                           child: TabBar(
+                            isScrollable: true,
                             unselectedLabelStyle:
                                 TextStyle(fontWeight: FontWeight.w300),
                             controller: _tabController,
@@ -110,13 +128,16 @@ class SearchFilterState extends State<SearchFilter>
                                     BorderRadius.circular(tabBarHeight)),
                             tabs: [
                               Tab(
-                                child: Text("TV"),
+                                child: Text("Discover TV"),
                               ),
                               Tab(
-                                child: Text("Movies"),
+                                child: Text("Discover Movies"),
                               ),
                               Tab(
-                                child: Text("All"),
+                                child: Text("Search Tv"),
+                              ),
+                              Tab(
+                                child: Text("Search Movies"),
                               ),
                             ],
                           )),
@@ -155,8 +176,7 @@ class SearchFilterState extends State<SearchFilter>
                                                 .TMDB_SORT_OPTIONS["sort_by"]
                                                 .elementAt(0)
                                             : bloc.sortBy,
-                                        onChanged: bloc.tmdbEndPoint ==
-                                                TmdbEndPoint.all
+                                        onChanged: bloc.searchEnabled
                                             ? null
                                             : (value) {
                                                 bloc.changeSortBy(value);
@@ -205,8 +225,7 @@ class SearchFilterState extends State<SearchFilter>
                                         child: RangeSlider(
                                           values: RangeValues(
                                               bloc.ratingLow, bloc.ratinghigh),
-                                          onChanged: bloc.tmdbEndPoint ==
-                                                  TmdbEndPoint.all
+                                          onChanged: bloc.searchEnabled
                                               ? null
                                               : (RangeValues values) {
                                                   context
@@ -256,8 +275,7 @@ class SearchFilterState extends State<SearchFilter>
                                         child: RangeSlider(
                                           values: RangeValues(bloc.runtimeLow,
                                               bloc.runtimeHigh),
-                                          onChanged: bloc.tmdbEndPoint ==
-                                                  TmdbEndPoint.all
+                                          onChanged: bloc.searchEnabled
                                               ? null
                                               : (RangeValues values) {
                                                   bloc.updateRunTime(
@@ -294,10 +312,8 @@ class SearchFilterState extends State<SearchFilter>
                                 child: Container(),
                               ),
                               _field(context, "2000", (value) {},
-                                  enabled: searchBloc.tmdbEndPoint ==
-                                          TmdbEndPoint.all
-                                      ? false
-                                      : true),
+                                  enabled:
+                                      searchBloc.searchEnabled ? false : true),
                               SizedBox(
                                 width: screenWidth * 0.05,
                               )
@@ -310,8 +326,8 @@ class SearchFilterState extends State<SearchFilter>
                             padding: EdgeInsets.all(5),
                             width: screenWidth * 0.8,
                             constraints: BoxConstraints(
-                                minHeight: screenHeight * 0.05,
-                                maxHeight: screenHeight * 0.15),
+                              minHeight: screenHeight * 0.05,
+                            ),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(
                                     Settings.GENERAL_BORDER_RADIUS),
@@ -329,7 +345,7 @@ class SearchFilterState extends State<SearchFilter>
                                                 _extractGenriesList(data.data))
                                         : Container()),
                           ),
-                          action: searchBloc.tmdbEndPoint == TmdbEndPoint.all
+                          action: searchBloc.searchEnabled
                               ? IconButton(
                                   icon: Icon(
                                     Icons.add_circle,

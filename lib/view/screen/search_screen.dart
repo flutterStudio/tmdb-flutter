@@ -1,8 +1,14 @@
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/model/movie.dart';
+import 'package:TMDB_Mobile/utils/data.dart';
+import 'package:TMDB_Mobile/view/bloc/search_bloc.dart';
 import 'package:TMDB_Mobile/view/widget/dialog_search_filter.dart';
 import 'package:TMDB_Mobile/view/widget/item_movie_stacked_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -10,12 +16,27 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  RefreshController _refreshController;
+  TextEditingController _searchFieldController;
+  SearchBloc _bloc;
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: NestedScrollView(
-            headerSliverBuilder: _headerSliverBuilder,
-            body: _sliverBuilderBody(context)),
-      );
+  void initState() {
+    _refreshController = RefreshController();
+    _searchFieldController = TextEditingController();
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _bloc = Provider.of<SearchBloc>(context);
+    _searchFieldController.text = _bloc.query;
+    return Scaffold(
+      body: NestedScrollView(
+          headerSliverBuilder: _headerSliverBuilder,
+          body: _sliverBuilderBody(context)),
+    );
+  }
 
   List<Widget> _headerSliverBuilder(
       BuildContext context, bool innerBoxScrolled) {
@@ -50,7 +71,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           child: Container(
                               alignment: Alignment.center,
                               child: TextField(
-                                  onSubmitted: null,
+                                  controller: _searchFieldController,
+                                  onChanged: (String text) {
+                                    _bloc.updateQuery(text);
+                                  },
                                   textAlign: TextAlign.center,
                                   textAlignVertical: TextAlignVertical.center,
                                   style: TextStyle(
@@ -117,8 +141,14 @@ class _SearchScreenState extends State<SearchScreen> {
                                       Settings.GENERAL_BORDER_RADIUS),
                                   child: SearchFilter())),
                           context: context,
-                          // ,
                         ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.search,
+                          color: Colors.white,
+                        ),
+                        onPressed: () => _bloc.search(RequestType.fetch),
                       ),
                     ]))),
       )
@@ -127,25 +157,97 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _sliverBuilderBody(BuildContext context) {
     return Container(
-      color: Settings.COLOR_DARK_PRIMARY,
-      child: GridView.builder(
-          addAutomaticKeepAlives: true,
-          padding: EdgeInsets.all(0),
-          itemCount: 20,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 5,
-              mainAxisSpacing: 5,
-              childAspectRatio: 0.7),
-          itemBuilder: (context, index) => MovieStackedView(
-                image: "assets/placeholders/poster.jpg",
-                width: MediaQuery.of(context).size.width * 0.5,
-                height: MediaQuery.of(context).size.height * 0.35,
-                highlight: index % 2 == 0
-                    ? Settings.COLOR_DARK_PRIMARY
-                    : Settings.COLOR_DARK_HIGHLIGHT,
-                name: "Dark",
-              )),
-    );
+        color: Settings.COLOR_DARK_PRIMARY,
+        child: StreamBuilder<dynamic>(
+            stream: _bloc.searchStreams, builder: _streamBuilder));
+  }
+
+  Widget _streamBuilder(BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+    Widget widget = Center(child: Text("Search in TMDB api"));
+
+    if (snapshot.hasData) {
+      switch (snapshot.data.status) {
+        case DataStatus.faild:
+          {
+            widget = Center(
+                child: Text("Error Fetching Data, Check Your Connection"));
+            break;
+          }
+
+        case DataStatus.loading:
+          {
+            widget = Center(
+              child: SpinKitFadingCube(
+                color: Settings.COLOR_DARK_HIGHLIGHT,
+              ),
+            );
+            break;
+          }
+        case DataStatus.complete:
+          {
+            widget = Container(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: SmartRefresher(
+                  enablePullDown: true,
+                  onRefresh: () {
+                    _refreshController.requestRefresh();
+                    _bloc.search(RequestType.fetch)
+                      ..whenComplete(
+                          () => _refreshController.refreshCompleted());
+                  },
+                  enablePullUp: true,
+                  onLoading: () {
+                    if (snapshot.data.hasNext) {
+                      _refreshController.requestLoading();
+                      _bloc.search(
+                        RequestType.fetchMore,
+                      )..whenComplete(() =>
+                          snapshot.data.status == DataStatus.complete
+                              ? snapshot.data.hasData
+                                  ? _refreshController.loadComplete()
+                                  : _refreshController.loadNoData()
+                              : snapshot.data.status == DataStatus.faild
+                                  ? _refreshController.loadFailed()
+                                  : _refreshController.requestLoading());
+                    } else {
+                      _refreshController.loadNoData();
+                    }
+                  },
+                  controller: _refreshController,
+                  child: GridView.builder(
+                      addAutomaticKeepAlives: true,
+                      padding: EdgeInsets.all(0),
+                      itemCount: snapshot.data.data.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 5,
+                          childAspectRatio: 0.6),
+                      itemBuilder: (context, index) => snapshot.data
+                              is Data<List<Movie>>
+                          ? MovieStackedView.movie(
+                              offline: false,
+                              movie: snapshot.data.data[index],
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              height: MediaQuery.of(context).size.height * 0.35,
+                              highlight: index % 2 == 0
+                                  ? Settings.COLOR_DARK_PRIMARY
+                                  : Settings.COLOR_DARK_HIGHLIGHT,
+                            )
+                          : MovieStackedView.tv(
+                              offline: false,
+                              tvShow: snapshot.data.data[index],
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              height: MediaQuery.of(context).size.height * 0.35,
+                              highlight: index % 2 == 0
+                                  ? Settings.COLOR_DARK_PRIMARY
+                                  : Settings.COLOR_DARK_HIGHLIGHT,
+                            ))),
+            );
+            break;
+          }
+      }
+    }
+    return widget;
   }
 }

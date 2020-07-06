@@ -1,4 +1,5 @@
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/model/movie.dart';
 import 'package:TMDB_Mobile/view/widget/item_movie_stacked_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -51,14 +52,14 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
           itemCount: 20,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2, childAspectRatio: 0.8),
-          itemBuilder: (context, index) => MovieStackedView(
-                image: "assets/placeholders/poster.jpg",
+          itemBuilder: (context, index) => MovieStackedView.movie(
+                // movie: "assets/placeholders/poster.jpg",
                 width: MediaQuery.of(context).size.width * 0.5,
                 height: MediaQuery.of(context).size.height * 0.35,
                 highlight: index % 2 == 0
                     ? Settings.COLOR_DARK_PRIMARY
                     : Settings.COLOR_DARK_HIGHLIGHT,
-                name: "Dark",
+                movie: Movie(),
               )),
     );
   }

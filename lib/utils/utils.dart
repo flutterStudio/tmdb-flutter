@@ -42,7 +42,7 @@ class Utils {
       for (dynamic item in list) {
         listString += ",${item.toString()}";
       }
-      listString.substring(1, listString.length - 1);
+      listString = listString.substring(1, listString.length);
     }
     return listString;
   }

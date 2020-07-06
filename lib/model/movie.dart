@@ -34,7 +34,7 @@ class Movie extends Model {
 
   @override
   Movie.fromJson(Map<String, dynamic> json) : super.fromJson(json) {
-    popularity = json['popularity'];
+    popularity = double.tryParse(json['popularity'].toString());
     voteCount = json['vote_count'];
     video = json['video'];
     posterPath = json['poster_path'];

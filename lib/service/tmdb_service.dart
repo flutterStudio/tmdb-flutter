@@ -87,7 +87,7 @@ class TmdbService {
         }
       default:
         {
-          throw DataFetchException(message: "messageError");
+          throw DataFetchException(message: "Unhandled Exception");
         }
     }
   }
