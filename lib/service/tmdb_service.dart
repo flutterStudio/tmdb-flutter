@@ -31,9 +31,10 @@ class TmdbService {
   /// to use the [trending] endpoint make sure to make [trending = true].
   /// Returns a string Response.
   Future<String> get(TmdbEndPoint endPoint, Map<String, dynamic> options,
-      {Duration timeout, bool trending = false}) async {
-    String requestUrl =
-        Utils.generateTmdbRerquestUrl(endPoint, trending ? {} : options);
+      {Duration timeout, bool trending = false, String spacialOption}) async {
+    String requestUrl = Utils.generateTmdbRerquestUrl(
+        endPoint, trending ? {} : options,
+        spacialOption: spacialOption);
     HttpClientResponse httpClientResponse;
 
     try {

@@ -15,9 +15,9 @@ class Data<T> {
     @required T data,
     @required DataStatus status,
     @required String message,
-    int page,
-    int totalPages,
-    int totalResults,
+    int page = 0,
+    int totalPages = 0,
+    int totalResults = 0,
   })  : _data = data,
         _status = status,
         _message = message,
@@ -71,8 +71,8 @@ class Data<T> {
     _totalPages = totalPages;
     _totalResults = totalResults;
     _hasData = _data != null;
-    _hasNext = _page < totalPages;
-    _hasPrevious = _page > 1;
+    _hasNext = page < totalPages;
+    _hasPrevious = page > 1;
   }
 
   Data.loading({

@@ -227,6 +227,8 @@ class _SearchScreenState extends State<SearchScreen> {
                               is Data<List<Movie>>
                           ? ItemStackedView.movie(
                               offline: false,
+                              heroTag:
+                                  "${Settings.HERO_IMAGE_TAG}_MOVIE_SEARCH_${snapshot.data.data[index].id}",
                               movie: snapshot.data.data[index],
                               width: MediaQuery.of(context).size.width * 0.5,
                               height: MediaQuery.of(context).size.height * 0.35,
@@ -236,6 +238,8 @@ class _SearchScreenState extends State<SearchScreen> {
                             )
                           : ItemStackedView.tv(
                               offline: false,
+                              heroTag:
+                                  "${Settings.HERO_IMAGE_TAG}_TV_SEARCH_${snapshot.data.data[index].id}",
                               tvShow: snapshot.data.data[index],
                               width: MediaQuery.of(context).size.width * 0.5,
                               height: MediaQuery.of(context).size.height * 0.35,

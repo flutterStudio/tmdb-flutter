@@ -8,11 +8,13 @@ import 'package:flutter/widgets.dart';
 
 class Utils {
   static String generateTmdbRerquestUrl(
-      TmdbEndPoint endPoint, Map<String, dynamic> options) {
+      TmdbEndPoint endPoint, Map<String, dynamic> options,
+      {String spacialOption = ""}) {
     String url = Settings.TMDB_API_BASE_URL +
         Settings.TMDB_ENDPOINTS[endPoint] +
+        "${spacialOption != null ? spacialOption : ""}" +
         "?api_key=${Settings.TMDB_API_KEY}" +
-        _generateOptionsString(options);
+        "${spacialOption != null ? "" : _generateOptionsString(options)}";
 
     return url;
   }

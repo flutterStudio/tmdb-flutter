@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:TMDB_Mobile/common/settings.dart';
 import 'package:TMDB_Mobile/model/MovieDetails.dart';
+import 'package:TMDB_Mobile/model/cast.dart';
 import 'package:TMDB_Mobile/model/genre.dart';
 import 'package:TMDB_Mobile/model/movie.dart';
+import 'package:TMDB_Mobile/model/tv_show_details.dart';
 import 'package:TMDB_Mobile/model/tvshow_model.dart';
+import 'package:TMDB_Mobile/model/video.dart';
 import 'package:TMDB_Mobile/service/tmdb_service.dart';
 import 'package:TMDB_Mobile/utils/data.dart';
 
@@ -20,6 +23,7 @@ class MainRepository {
   Data<List<TvShow>> _searchScreenTvShows;
 
   List<MovieDetails> _movies;
+  List<TvShowDetails> _tvShows;
 
   Data<List<Movie>> _trendingMovies;
 
@@ -46,7 +50,7 @@ class MainRepository {
     _searchScreenTvShows = Data.empty(initialData: []);
 
     _movies = [];
-
+    _tvShows = [];
     _trendingMovies = Data.empty(initialData: []);
     _popularMovies = Data.empty(initialData: []);
     _topRatedMovies = Data.empty(initialData: []);
@@ -63,6 +67,8 @@ class MainRepository {
       TmdbEndPoint.discoverMovies: _searchScreenMovies,
       TmdbEndPoint.searchMovies: _searchScreenMovies,
       TmdbEndPoint.movie: _movies,
+      TmdbEndPoint.tv: _tvShows,
+      TmdbEndPoint.trendingMovieWeek: _trendingMovies,
       TmdbEndPoint.discoverTv: _searchScreenTvShows,
       TmdbEndPoint.searchTv: _searchScreenTvShows,
     };
@@ -140,6 +146,56 @@ class MainRepository {
   }
 
   /// Fetches Tv shows from api with filters options.
+  Future<Data<List<Movie>>> getSimilarMovies(int id,
+      {RequestType requestType = RequestType.fetch}) async {
+    Data<List<Movie>> data = Data.loading(initialData: []);
+    List<Movie> movies = [];
+    try {
+      String rawResponse = await TmdbService()
+          .get(TmdbEndPoint.movie, null, spacialOption: "/$id/similar");
+      var jsonResponse = jsonDecode(rawResponse) as Map;
+      if ((jsonResponse['results'] as List).length > 0) {
+        for (var rawMovie in jsonResponse['results'] as List) {
+          movies.add(Movie.fromJson(rawMovie));
+        }
+      }
+      data = Data.complete(
+          data: movies,
+          page: jsonResponse["page"],
+          totalPages: jsonResponse["total_pages"],
+          totalResults: jsonResponse["total_results"]);
+    } catch (e) {
+      data = Data.faild(previousData: [], message: e.toString());
+    }
+    return data;
+  }
+
+  /// Fetches Tv shows from api with filters options.
+  Future<Data<List<TvShow>>> getSimilarTvShows(int id,
+      {RequestType requestType = RequestType.fetch}) async {
+    Data<List<TvShow>> data = Data.loading(initialData: []);
+    List<TvShow> tvShows = [];
+    try {
+      String rawResponse = await TmdbService()
+          .get(TmdbEndPoint.tv, null, spacialOption: "/$id/similar");
+      var jsonResponse = jsonDecode(rawResponse) as Map;
+      if ((jsonResponse['results'] as List).length > 0) {
+        for (var rawMovie in jsonResponse['results'] as List) {
+          tvShows.add(TvShow.fromJson(rawMovie));
+        }
+      }
+      data = Data.complete(
+          data: tvShows,
+          page: jsonResponse["page"],
+          totalPages: jsonResponse["total_pages"],
+          totalResults: jsonResponse["total_results"]);
+    } catch (e) {
+      data = Data.faild(previousData: [], message: e.toString());
+    }
+    return data;
+  }
+
+  /// Fetches Tv shows from api with filters options.
   Future<Data<List<TvShow>>> getTvShows(TmdbEndPoint endpoint,
       {Map<String, dynamic> options,
       RequestType requestType = RequestType.fetch,
@@ -207,7 +263,8 @@ class MainRepository {
     try {
       String rawResponse = await TmdbService().get(
         TmdbEndPoint.movie,
-        {"id": id},
+        null,
+        spacialOption: "/$id",
       );
       var jsonResponse = jsonDecode(rawResponse) as Map;
       if (jsonResponse != null) {
@@ -219,6 +276,85 @@ class MainRepository {
       }
     } catch (e) {
       data = Data.faild(message: e.toString());
+    }
+    return data;
+  }
+
+  /// Get Details of the movie with the following [id].,
+  Future<Data<TvShowDetails>> getTvShowDetails(int id) async {
+    Data<TvShowDetails> data = Data.loading(initialData: TvShowDetails());
+    TvShowDetails tvShow =
+        _tvShows.firstWhere((element) => element.id == id, orElse: () => null);
+    if (tvShow != null) {
+      return Data.complete(data: tvShow);
+    }
+    try {
+      String rawResponse = await TmdbService().get(
+        TmdbEndPoint.tv,
+        null,
+        spacialOption: "/$id",
+      );
+      var jsonResponse = jsonDecode(rawResponse) as Map;
+      if (jsonResponse != null) {
+        tvShow = TvShowDetails.fromJson(jsonResponse);
+        _tvShows.add(tvShow);
+        data = Data.complete(
+          data: tvShow,
+        );
+      }
+    } catch (e) {
+      data = Data.faild(message: e.toString());
+    }
+    return data;
+  }
+
+  /// Get Details of the movie with the following [id].,
+  Future<Data<List<Video>>> getMovieVideos(int id,
+      {RequestType equestType = RequestType.fetch}) async {
+    Data<List<Video>> data = Data.loading(initialData: []);
+
+    List<Video> videos = [];
+    try {
+      String rawResponse = await TmdbService()
+          .get(TmdbEndPoint.movie, null, spacialOption: "/$id/videos");
+      var jsonResponse = jsonDecode(rawResponse) as Map;
+      if ((jsonResponse['results'] as List).length > 0) {
+        for (var rawTVideo in jsonResponse['results'] as List) {
+          videos.add(Video.fromJson(rawTVideo));
+        }
+      }
+
+      data = Data.complete(
+          data: videos,
+          page: jsonResponse["page"],
+          totalPages: jsonResponse["total_pages"],
+          totalResults: jsonResponse["total_results"]);
+    } catch (e) {
+      data = Data.faild(previousData: [], message: e.toString());
+    }
+    return data;
+  }
+
+  Future<Data<List<Cast>>> getCast(int id, TmdbEndPoint endpoint,
+      {RequestType equestType = RequestType.fetch}) async {
+    Data<List<Cast>> data = Data.loading(initialData: []);
+
+    List<Cast> cast = [];
+    try {
+      String rawResponse = await TmdbService()
+          .get(endpoint, null, spacialOption: "/$id/credits");
+      var jsonResponse = jsonDecode(rawResponse) as Map;
+      if ((jsonResponse['cast'] as List).length > 0) {
+        for (var rawTVideo in jsonResponse['cast'] as List) {
+          cast.add(Cast.fromJson(rawTVideo));
+        }
+      }
+
+      data = Data.complete(
+        data: cast,
+      );
+    } catch (e) {
+      data = Data.faild(previousData: [], message: e.toString());
     }
     return data;
   }

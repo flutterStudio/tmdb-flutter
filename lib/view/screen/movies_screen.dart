@@ -3,11 +3,11 @@ import 'package:TMDB_Mobile/model/movie.dart';
 import 'package:TMDB_Mobile/utils/data.dart';
 import 'package:TMDB_Mobile/view/bloc/movies_screen_bloc.dart';
 import 'package:TMDB_Mobile/view/screen/details_screen.dart';
-import 'package:TMDB_Mobile/view/widget/item_verical_view.dart';
+import 'package:TMDB_Mobile/view/widget/hero_network_image.dart';
+import 'package:TMDB_Mobile/view/widget/item_vertical_view.dart';
 import 'package:TMDB_Mobile/view/widget/movie_rating_rectangular.dart';
 import 'package:TMDB_Mobile/view/widget/movies_slider_widget.dart';
 import 'package:TMDB_Mobile/view/widget/screen_section.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
@@ -26,21 +26,6 @@ class _MoviesScreenState extends State<MoviesScreen> {
   @override
   void initState() {
     controller = ScrollController();
-    // controller.addListener(() {
-    //   // Listen to scrolling events
-    //   // If the user is scrolling down then hide the bottom navigation
-    //   // if (controller.position.userScrollDirection == ScrollDirection.forward) {
-    //   //   if (!_mainBloc.isBottomNavigationUp) {
-    //   //     _mainBloc.showBottomNavigation();
-    //   //   }
-    //   //   // If the user is scrolling up then shpw the bottom navigation
-
-    //   // } else {
-    //   //   if (_mainBloc.isBottomNavigationUp) {
-    //   //     _mainBloc.hideBottomNavigation();
-    //   //   }
-    //   // }
-    // });
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _moviesScreenBloc.getUpcoming();
       _moviesScreenBloc.getPopular();
@@ -140,7 +125,10 @@ class _MoviesScreenState extends State<MoviesScreen> {
                                           scrollDirection: Axis.horizontal,
                                           itemBuilder: (context, index) =>
                                               ItemVerticalView.movie(
-                                                  snapshot.data.data[index]))
+                                                snapshot.data.data[index],
+                                                heroTag:
+                                                    "${Settings.HERO_IMAGE_TAG}_VIDEO_UPCOMING_${snapshot.data.data[index].id}",
+                                              ))
                                       : Center(
                                           child: Text("Empty Response"),
                                         );
@@ -192,69 +180,46 @@ class _MoviesScreenState extends State<MoviesScreen> {
                                                     mainAxisSpacing: 2,
                                                     crossAxisCount: 3),
                                             itemBuilder: (context, index) =>
-                                                GestureDetector(
-                                                    onTap: () {
-                                                      Navigator.of(context).push(MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              DetailsScreen.movie(
-                                                                  movie: snapshot
-                                                                          .data
-                                                                          .data[
-                                                                      index])));
-                                                    },
-                                                    child: Container(
-                                                      width: screenWidth * 0.22,
-                                                      height:
-                                                          screenHeight * 0.25,
-                                                      child: Stack(
-                                                        children: <Widget>[
-                                                          SizedBox.expand(
-                                                              child:
-                                                                  CachedNetworkImage(
-                                                            fit: BoxFit.fill,
-                                                            placeholder: (context,
-                                                                    _) =>
-                                                                Image.asset(
-                                                                    "assets/placeholders/poster.jpg"),
-                                                            imageUrl:
-                                                                "${Settings.TMDB_API_IMAGE_URL}w300${snapshot.data.data[index].posterPath}",
-                                                            progressIndicatorBuilder: (context, url, downloadProgress) => Center(
-                                                                child: SizedBox(
-                                                                    width:
-                                                                        screenWidth *
-                                                                            0.2,
-                                                                    height:
-                                                                        screenWidth *
-                                                                            0.2,
-                                                                    child: Center(
-                                                                        child: CircularProgressIndicator(
-                                                                            value:
-                                                                                downloadProgress.progress)))),
-                                                            errorWidget: (context,
-                                                                    url,
-                                                                    error) =>
-                                                                Center(
-                                                                    child: Icon(
-                                                              Icons.error,
-                                                              color: Settings
-                                                                  .COLOR_DARK_HIGHLIGHT,
-                                                            )),
-                                                          )),
-                                                          Positioned(
-                                                              bottom:
-                                                                  screenHeight *
-                                                                      0.02,
-                                                              child:
-                                                                  MovieRatingRectangular(
-                                                                text: "TMDB",
-                                                                value: snapshot
-                                                                    .data
-                                                                    .data[index]
-                                                                    .voteAverage,
-                                                              ))
-                                                        ],
-                                                      ),
-                                                    )))
+                                                Container(
+                                                  width: screenWidth * 0.22,
+                                                  height: screenHeight * 0.25,
+                                                  child: Stack(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    children: <Widget>[
+                                                      Container(
+                                                          child:
+                                                              HeroNetworkImage(
+                                                        tag:
+                                                            "${Settings.HERO_IMAGE_TAG}_MOVIE_TRENDING_${snapshot.data.data[index].id}",
+                                                        // height:
+                                                        //     screenHeight * 0.25,
+                                                        // width:
+                                                        //     screenWidth * 0.22,
+                                                        destination:
+                                                            DetailsScreen.movie(
+                                                          movie: snapshot
+                                                              .data.data[index],
+                                                          heroTag:
+                                                              "${Settings.HERO_IMAGE_TAG}_MOVIE_TRENDING_${snapshot.data.data[index].id}",
+                                                        ),
+                                                        image:
+                                                            "${Settings.TMDB_API_IMAGE_URL}w300${snapshot.data.data[index].posterPath}",
+                                                      )),
+                                                      Positioned(
+                                                          bottom: screenHeight *
+                                                              0.02,
+                                                          child:
+                                                              MovieRatingRectangular(
+                                                            text: "TMDB",
+                                                            value: snapshot
+                                                                .data
+                                                                .data[index]
+                                                                .voteAverage,
+                                                          ))
+                                                    ],
+                                                  ),
+                                                ))
                                         : Center(
                                             child: Text("Empty Response"),
                                           );

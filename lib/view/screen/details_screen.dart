@@ -1,38 +1,40 @@
 import 'dart:ui';
 
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/model/cast.dart';
 import 'package:TMDB_Mobile/model/genre.dart';
 import 'package:TMDB_Mobile/model/movie.dart';
 import 'package:TMDB_Mobile/model/tvshow_model.dart';
+import 'package:TMDB_Mobile/utils/data.dart';
+import 'package:TMDB_Mobile/view/bloc/details_screen_bloc.dart';
 import 'package:TMDB_Mobile/view/widget/actors_horizontal_list.dart';
 import 'package:TMDB_Mobile/view/widget/genre_widget.dart';
+import 'package:TMDB_Mobile/view/widget/hero_network_image.dart';
 import 'package:TMDB_Mobile/view/widget/horizontal_movie_options.dart';
-import 'package:TMDB_Mobile/view/widget/item_movie_verical_view.dart';
 import 'package:TMDB_Mobile/view/widget/parental_guide_.dart';
 import 'package:TMDB_Mobile/view/widget/screen_section.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class DetailsScreen extends StatefulWidget {
   final Movie _movie;
   final TvShow _tvShow;
   final String _heroTag;
   final bool _isMovie;
-  DetailsScreen.movie({
-    @required Movie movie,
-  })  : _movie = movie,
+  DetailsScreen.movie({@required Movie movie, String heroTag})
+      : _movie = movie,
         _tvShow = null,
         _isMovie = true,
-        _heroTag = "heroMovie" + movie.id.toString(),
+        _heroTag = heroTag,
         assert(movie != null);
 
-  DetailsScreen.tvShow({
-    @required TvShow tvShow,
-  })  : _movie = null,
+  DetailsScreen.tvShow({@required TvShow tvShow, String heroTag})
+      : _movie = null,
         _isMovie = false,
         _tvShow = tvShow,
-        _heroTag = "heroTv" + tvShow.id.toString(),
+        _heroTag = heroTag,
         assert(tvShow != null);
   @override
   _MovieDetailsState createState() => _MovieDetailsState();
@@ -41,9 +43,11 @@ class DetailsScreen extends StatefulWidget {
 class _MovieDetailsState extends State<DetailsScreen>
     with SingleTickerProviderStateMixin {
   AnimationController _animationController;
-
+  DetailsScreenBloc _detailScreenBloc;
   @override
   void initState() {
+    _detailScreenBloc = DetailsScreenBloc();
+
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 4000),
@@ -51,6 +55,10 @@ class _MovieDetailsState extends State<DetailsScreen>
       lowerBound: 0,
     );
     _animationController.animateTo(0.2);
+
+    widget._movie != null
+        ? _detailScreenBloc.getCast(widget._movie.id, true)
+        : _detailScreenBloc.getCast(widget._tvShow.id, false);
     super.initState();
   }
 
@@ -67,6 +75,7 @@ class _MovieDetailsState extends State<DetailsScreen>
                 child: Stack(
                   children: <Widget>[
                     // Background Image
+
                     Container(
                       height: screenHeight * 1.4,
                       child: CachedNetworkImage(
@@ -91,6 +100,7 @@ class _MovieDetailsState extends State<DetailsScreen>
                         )),
                       ),
                     ),
+                    // ),
                     Container(
                         height: screenHeight * 1.4,
                         decoration: BoxDecoration(
@@ -141,40 +151,23 @@ class _MovieDetailsState extends State<DetailsScreen>
                             children: <Widget>[
                               // Poster
                               SizedBox(
-                                  width: screenWidth * 0.4,
-                                  height: screenHeight * 0.35,
-                                  child: Hero(
-                                      tag: widget._heroTag,
-                                      child: Material(
-                                          color: Colors.transparent,
-                                          child: InkWell(
-                                              child: CachedNetworkImage(
-                                            fit: BoxFit.fill,
-                                            placeholder: (context, _) =>
-                                                Image.asset(
-                                                    "assets/placeholders/poster.jpg"),
-                                            imageUrl:
-                                                "${Settings.TMDB_API_IMAGE_URL}w300${widget._isMovie ? widget._movie.posterPath : widget._tvShow.posterPath}",
-                                            progressIndicatorBuilder: (context,
-                                                    url, downloadProgress) =>
-                                                Center(
-                                                    child: SizedBox(
-                                                        width:
-                                                            screenWidth * 0.2,
-                                                        height:
-                                                            screenWidth * 0.2,
-                                                        child: Center(
-                                                            child: CircularProgressIndicator(
-                                                                value: downloadProgress
-                                                                    .progress)))),
-                                            errorWidget:
-                                                (context, url, error) => Center(
-                                                    child: Icon(
-                                              Icons.error,
-                                              color:
-                                                  Settings.COLOR_DARK_HIGHLIGHT,
-                                            )),
-                                          ))))),
+                                width: screenWidth * 0.4,
+                                height: screenHeight * 0.35,
+                                child: HeroNetworkImage(
+                                  tag: widget._heroTag,
+                                  width: screenWidth * 0.45,
+                                  height: screenHeight * 0.4,
+                                  destination: widget._movie != null
+                                      ? DetailsScreen.movie(
+                                          movie: widget._movie,
+                                        )
+                                      : DetailsScreen.tvShow(
+                                          tvShow: widget._tvShow,
+                                        ),
+                                  image:
+                                      "${Settings.TMDB_API_IMAGE_URL}w300${widget._movie != null ? widget._movie.posterPath : widget._tvShow.posterPath}",
+                                ),
+                              ),
                               // info Section
                               Container(
                                   width: screenWidth * 0.5,
@@ -294,24 +287,45 @@ class _MovieDetailsState extends State<DetailsScreen>
                             ),
                           ),
                           ScreenSection(
-                            background: Colors.transparent,
-                            title: "Cast",
-                            onViewMore: () {},
-                            body: ActorsHorizontalLs(screenWidth * 0.25),
-                          ),
-                          ScreenSection(
-                            background: Colors.transparent,
-                            body: Container(
-                                height: screenHeight * 0.5,
-                                child: ListView.builder(
-                                    itemExtent: screenWidth * 0.6,
-                                    itemCount: 4,
-                                    scrollDirection: Axis.horizontal,
-                                    itemBuilder: (context, index) =>
-                                        MovieVerticalView(index))),
-                            onViewMore: null,
-                            title: "More Like This",
-                          ),
+                              background: Colors.transparent,
+                              title: "Cast",
+                              onViewMore: () {},
+                              body: StreamBuilder<Data<List<Cast>>>(
+                                  stream: _detailScreenBloc.castStream,
+                                  builder: (context, snapShot) {
+                                    Widget widget = Center(
+                                        child: SpinKitCubeGrid(
+                                      color: Settings.COLOR_DARK_HIGHLIGHT,
+                                    ));
+                                    if (snapShot.hasData) {
+                                      switch (snapShot.data.status) {
+                                        case DataStatus.faild:
+                                          {
+                                            widget = Center(
+                                              child: Text(
+                                                  "Error Loading upcoming Movies"),
+                                            );
+                                            break;
+                                          }
+                                        case DataStatus.complete:
+                                          {
+                                            widget = snapShot.data.data.length >
+                                                    0
+                                                ? ActorsHorizontal(
+                                                    screenWidth * 0.25,
+                                                    snapShot.data.data,
+                                                  )
+                                                : Center(
+                                                    child:
+                                                        Text("Empty Response"),
+                                                  );
+                                            break;
+                                          }
+                                        default:
+                                      }
+                                    }
+                                    return widget;
+                                  }))
                         ]),
                   ],
                 ))));

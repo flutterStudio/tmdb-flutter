@@ -94,14 +94,13 @@ class Settings {
 
   static const int MAX_YEAR = 3000;
   static const int MIN_YEAR = 0;
-
   static const double MAX_MOVIE_RUNTIME = 10.0;
   static const double MIN_MOVIE_RUNTIME = 0.0;
-
   static const double MAX_RATING = 10.0;
   static const double MIN_RATING = 0.0;
-
   static const int MAX_GENRES_PER_FILTER = 4;
+
+  static const String HERO_IMAGE_TAG = "HERO_IMAGE";
 }
 
 /// TMDB endpoints
