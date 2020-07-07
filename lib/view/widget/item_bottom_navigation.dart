@@ -20,7 +20,7 @@ class BottomNavigationItem extends StatelessWidget {
     this.icon,
     this.size,
     this.activeColor = Settings.COLOR_DARK_HIGHLIGHT,
-    this.defaultColor = Settings.COLOR_DARK_SECONDARY,
+    this.defaultColor = Settings.COLOR_DARK_SHADOW,
   }) : assert(index != null);
   @override
   Widget build(BuildContext context) => IconButton(

@@ -1,5 +1,6 @@
 import 'package:TMDB_Mobile/repository/main_repository.dart';
 import 'package:TMDB_Mobile/view/bloc/main_bloc.dart';
+import 'package:TMDB_Mobile/view/bloc/movies_screen_bloc.dart';
 import 'package:TMDB_Mobile/view/bloc/search_bloc.dart';
 import 'package:TMDB_Mobile/view/screen/main_screen.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,9 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProvider<SearchBloc>(
             create: (context) => SearchBloc(),
+          ),
+          Provider<MoviesScreenBloc>(
+            create: (context) => MoviesScreenBloc(),
           ),
         ]);
   }

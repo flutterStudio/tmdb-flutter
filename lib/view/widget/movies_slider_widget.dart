@@ -1,11 +1,18 @@
 import 'dart:ui';
 
 import 'package:TMDB_Mobile/common/settings.dart';
+import 'package:TMDB_Mobile/model/movie.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
 class MoviesSlider extends StatefulWidget {
+  final List<Movie> _movies;
+  MoviesSlider({@required movies})
+      : _movies = movies,
+        assert(movies != null && movies.length > 0);
+
   @override
   _MoviesSliderState createState() => _MoviesSliderState();
 }
@@ -13,7 +20,7 @@ class MoviesSlider extends StatefulWidget {
 class _MoviesSliderState extends State<MoviesSlider> {
   @override
   Widget build(BuildContext context) {
-    double sliderHeight = MediaQuery.of(context).size.height * 0.35;
+    double sliderHeight = MediaQuery.of(context).size.height * 0.3;
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
@@ -23,18 +30,36 @@ class _MoviesSliderState extends State<MoviesSlider> {
         pagination: SwiperPagination(),
         itemBuilder: (context, index) => Stack(children: <Widget>[
           Stack(children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: AssetImage("assets/placeholders/trailer1.jpeg")),
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 0.2, sigmaY: 0.2),
-                child: Container(
-                  color: Colors.black.withOpacity(0.1),
+            Stack(
+              children: <Widget>[
+                SizedBox.expand(
+                    child: CachedNetworkImage(
+                  fit: BoxFit.fill,
+                  placeholder: (context, _) =>
+                      Image.asset("assets/placeholders/poster.jpg"),
+                  imageUrl:
+                      "${Settings.TMDB_API_IMAGE_URL}w300${widget._movies[index].backdropPath}",
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      Center(
+                          child: SizedBox(
+                              width: screenWidth * 0.2,
+                              height: screenWidth * 0.2,
+                              child: Center(
+                                  child: CircularProgressIndicator(
+                                      value: downloadProgress.progress)))),
+                  errorWidget: (context, url, error) => Center(
+                      child: Icon(
+                    Icons.error,
+                    color: Settings.COLOR_DARK_HIGHLIGHT,
+                  )),
+                )),
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 0.2, sigmaY: 0.2),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.1),
+                  ),
                 ),
-              ),
+              ],
             ),
             Container(
                 decoration: BoxDecoration(
@@ -58,7 +83,7 @@ class _MoviesSliderState extends State<MoviesSlider> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  "Movie Name",
+                  "${widget._movies[index].title}",
                   style: TextStyle(
                       fontSize: screenWidth * Settings.FONT_SIZE_MEDIUM,
                       fontWeight: FontWeight.w400,

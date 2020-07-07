@@ -34,6 +34,17 @@ class Settings {
     TmdbEndPoint.searchMulti: "/search/multi",
     TmdbEndPoint.genreMovies: "genre/movie/list",
     TmdbEndPoint.genreTv: "genre/tv/list",
+    TmdbEndPoint.trendingMovieDay: "trending/movie/day",
+    TmdbEndPoint.trendingMovieWeek: "trending/movie/day",
+    TmdbEndPoint.trendingTvDay: "trending/tv/day",
+    TmdbEndPoint.trendingTvWeek: "trending/tv/week",
+    TmdbEndPoint.movie: "movie",
+    TmdbEndPoint.movieLatest: "movie/latest",
+    TmdbEndPoint.movieNowPlaying: "movie/now_playing",
+    TmdbEndPoint.moviePopular: "movie/popular",
+    TmdbEndPoint.movieTopRated: "movie/top_rated",
+    TmdbEndPoint.movieUpcoming: "movie/upcoming",
+    TmdbEndPoint.tv: "tv",
   };
 
   // TMDB endpoint's options
@@ -102,6 +113,17 @@ enum TmdbEndPoint {
   genreMovies,
   genreTv,
   searchMulti,
+  trendingMovieDay,
+  trendingMovieWeek,
+  trendingTvDay,
+  trendingTvWeek,
+  movie,
+  movieTopRated,
+  movieUpcoming,
+  movieLatest,
+  movieNowPlaying,
+  moviePopular,
+  tv,
 }
 
 /// TMDB Images sizes
@@ -118,3 +140,9 @@ enum RequestType {
   fetch, // Fetch new content.
   fetchMore, // Fetch the next page.
 }
+
+/// Trending media type.
+enum MediaType { movie, tv, person, all }
+
+/// Trending time window.
+enum TimeWindow { day, week }

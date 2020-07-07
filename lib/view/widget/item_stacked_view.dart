@@ -58,8 +58,6 @@ class ItemStackedView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(children: [
       Container(
-        // width: _width,
-        // height: _height
         padding: EdgeInsets.zero,
         decoration: BoxDecoration(
             color: Settings.COLOR_DARK_SECONDARY,

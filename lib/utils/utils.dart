@@ -17,6 +17,7 @@ class Utils {
     return url;
   }
 
+  /// Search options string generating.
   static String _generateOptionsString(Map<String, dynamic> options) {
     String optionsString = "";
 
@@ -36,6 +37,7 @@ class Utils {
     return optionsString;
   }
 
+  /// Convvert list to string.
   static String _listToString(List<dynamic> list) {
     String listString = "";
     if (list.length > 0) {
@@ -56,6 +58,7 @@ class Utils {
     }
   }
 
+  /// Show Dialog.
   static void showCustomDialog(BuildContext context, Color background,
           double radius, Widget child) =>
       showDialog(
@@ -66,4 +69,12 @@ class Utils {
         context: context,
         // ,
       );
+
+  /// Convert an enum value to string.
+  static String enumToString(dynamic value) {
+    String result = value
+        .toString()
+        .substring(value.toString().indexOf('.') + 1, value.toString().length);
+    return result;
+  }
 }

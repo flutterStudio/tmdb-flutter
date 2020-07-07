@@ -19,15 +19,21 @@ class TmdbService {
 
   HttpClientRequest _httpClientRequest;
 
+  /// Close Http connection.
   void close() {
     if (_httpClientRequest != null) {
       _httpClientRequest.close();
     }
   }
 
+  /// Perform an Http Request to a specific [endPoint] with a map of [options],
+  /// You can also specify the [timeout] when the service cancels the request ,
+  /// to use the [trending] endpoint make sure to make [trending = true].
+  /// Returns a string Response.
   Future<String> get(TmdbEndPoint endPoint, Map<String, dynamic> options,
-      {Duration timeout}) async {
-    String requestUrl = Utils.generateTmdbRerquestUrl(endPoint, options);
+      {Duration timeout, bool trending = false}) async {
+    String requestUrl =
+        Utils.generateTmdbRerquestUrl(endPoint, trending ? {} : options);
     HttpClientResponse httpClientResponse;
 
     try {
