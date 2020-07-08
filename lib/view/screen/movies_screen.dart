@@ -98,7 +98,7 @@ class _MoviesScreenState extends State<MoviesScreen> {
                 horizontalPadding:
                     screenWidth * Settings.VERTICAL_SCREEN_PADDING,
                 body: Container(
-                    height: screenHeight * 0.5,
+                    height: screenHeight * 0.6,
                     child: StreamBuilder<Data<List<Movie>>>(
                         stream: _moviesScreenBloc.popularMoviesStream,
                         builder: (context, snapshot) {

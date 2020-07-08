@@ -32,6 +32,7 @@ class _MoviesSliderState extends State<MoviesSlider> {
       width: MediaQuery.of(context).size.width,
       height: sliderHeight,
       child: Swiper(
+        loop: false,
         viewportFraction: 0.9,
         scale: 0.9,
         layout: SwiperLayout.DEFAULT,
@@ -57,7 +58,7 @@ class _MoviesSliderState extends State<MoviesSlider> {
                                   height: 5,
                                   decoration: BoxDecoration(
                                       color: index == config.activeIndex
-                                          ? Settings.COLOR_DARK_HIGHLIGHT
+                                          ? Colors.accents[index]
                                           : Settings.COLOR_DARK_SECONDARY,
                                       borderRadius: BorderRadius.circular(5)),
                                 )))),
@@ -96,17 +97,6 @@ class _MoviesSliderState extends State<MoviesSlider> {
                             image:
                                 "${Settings.TMDB_API_IMAGE_URL}w300${widget._movies[index].backdropPath}",
                           )),
-                      BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 0.2, sigmaY: 0.2),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(
-                                Settings.GENERAL_BORDER_RADIUS),
-                          ),
-                          height: sliderHeight * 0.9,
-                        ),
-                      ),
                       Container(
                           height: sliderHeight * 0.9,
                           decoration: BoxDecoration(
@@ -114,14 +104,14 @@ class _MoviesSliderState extends State<MoviesSlider> {
                                 Settings.GENERAL_BORDER_RADIUS),
                             gradient: LinearGradient(
                                 colors: [
-                                  Settings.COLOR_DARK_SECONDARY
-                                      .withOpacity(0.7),
-                                  Settings.COLOR_DARK_PRIMARY.withOpacity(0.6),
+                                  Colors.accents[index],
                                   Settings.COLOR_DARK_HIGHLIGHT
-                                      .withOpacity(0.2),
+                                      .withOpacity(0.4),
+                                  Settings.COLOR_DARK_HIGHLIGHT
+                                      .withOpacity(0.4),
                                 ],
                                 begin: Alignment.centerLeft,
-                                stops: [0, 0.4, 1],
+                                stops: [0, 0.5, 1],
                                 end: Alignment.centerRight),
                           )),
                       Positioned(

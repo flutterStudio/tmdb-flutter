@@ -416,11 +416,12 @@ class _MovieDetailsState extends State<DetailsScreen>
                                     }
                                     return widget;
                                   })),
+                          // Similar items.
                           ScreenSection(
                             horizontalPadding:
                                 screenWidth * Settings.VERTICAL_SCREEN_PADDING,
                             body: Container(
-                                height: screenHeight * 0.5,
+                                height: screenHeight * 0.6,
                                 child: StreamBuilder<dynamic>(
                                     stream: _detailScreenBloc.similarDataStream,
                                     builder: (context, snapshot) {

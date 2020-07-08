@@ -64,7 +64,7 @@ class HeroNetworkImage extends StatelessWidget {
                                     (context, url, downloadProgress) => Center(
                                         child: SizedBox(
                                             width: _width * 0.2,
-                                            height: _height * 0.2,
+                                            height: _width * 0.2,
                                             child: Center(
                                                 child:
                                                     CircularProgressIndicator(
