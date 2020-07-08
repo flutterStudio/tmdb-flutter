@@ -44,8 +44,8 @@ class _MoviesScreenState extends State<MoviesScreen> {
     return SingleChildScrollView(
         controller: controller,
         child: Container(
-          padding: EdgeInsets.symmetric(
-              vertical: screenWidth * Settings.VERTICAL_SCREEN_PADDING),
+          padding: EdgeInsets.only(
+              top: screenWidth * Settings.VERTICAL_SCREEN_PADDING),
           color: Settings.COLOR_DARK_PRIMARY,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -149,7 +149,7 @@ class _MoviesScreenState extends State<MoviesScreen> {
                   background: Settings.COLOR_DARK_SECONDARY,
                   body: Container(
                       width: screenWidth,
-                      height: screenHeight * 0.46,
+                      height: screenHeight * 0.56,
                       child: StreamBuilder<Data<List<Movie>>>(
                           stream: _moviesScreenBloc.trendingMoviesStream,
                           builder: (context, snapshot) {
@@ -173,11 +173,10 @@ class _MoviesScreenState extends State<MoviesScreen> {
                                         ? GridView.builder(
                                             itemCount: 6,
                                             scrollDirection: Axis.vertical,
+                                            shrinkWrap: true,
                                             gridDelegate:
                                                 SliverGridDelegateWithFixedCrossAxisCount(
                                                     childAspectRatio: 0.7,
-                                                    crossAxisSpacing: 1,
-                                                    mainAxisSpacing: 2,
                                                     crossAxisCount: 3),
                                             itemBuilder: (context, index) =>
                                                 Container(
