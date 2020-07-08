@@ -192,10 +192,6 @@ class _MoviesScreenState extends State<MoviesScreen> {
                                                               HeroNetworkImage(
                                                         tag:
                                                             "${Settings.HERO_IMAGE_TAG}_MOVIE_TRENDING_${snapshot.data.data[index].id}",
-                                                        // height:
-                                                        //     screenHeight * 0.25,
-                                                        // width:
-                                                        //     screenWidth * 0.22,
                                                         destination:
                                                             DetailsScreen.movie(
                                                           movie: snapshot

@@ -11,6 +11,7 @@ import 'package:TMDB_Mobile/view/widget/actors_horizontal_list.dart';
 import 'package:TMDB_Mobile/view/widget/genre_widget.dart';
 import 'package:TMDB_Mobile/view/widget/hero_network_image.dart';
 import 'package:TMDB_Mobile/view/widget/horizontal_movie_options.dart';
+import 'package:TMDB_Mobile/view/widget/item_vertical_view.dart';
 import 'package:TMDB_Mobile/view/widget/parental_guide_.dart';
 import 'package:TMDB_Mobile/view/widget/screen_section.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -56,9 +57,9 @@ class _MovieDetailsState extends State<DetailsScreen>
     );
     _animationController.animateTo(0.2);
 
-    widget._movie != null
-        ? _detailScreenBloc.getCast(widget._movie.id, true)
-        : _detailScreenBloc.getCast(widget._tvShow.id, false);
+    _detailScreenBloc.getData(
+        widget._isMovie ? widget._movie.id : widget._tvShow.id,
+        widget._isMovie);
     super.initState();
   }
 
@@ -75,7 +76,6 @@ class _MovieDetailsState extends State<DetailsScreen>
                 child: Stack(
                   children: <Widget>[
                     // Background Image
-
                     Container(
                       height: screenHeight * 1.4,
                       child: CachedNetworkImage(
@@ -169,94 +169,141 @@ class _MovieDetailsState extends State<DetailsScreen>
                                 ),
                               ),
                               // info Section
-                              Container(
-                                  width: screenWidth * 0.5,
-                                  height: screenHeight * 0.3,
-                                  child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: <Widget>[
-                                            Expanded(
-                                                flex: 1,
-                                                child: Icon(
-                                                  Icons.access_time,
-                                                  size: screenWidth *
-                                                      Settings.FONT_SIZE_MEDIUM,
-                                                  color: Colors.white,
-                                                )),
-                                            Expanded(
-                                                flex: 4,
-                                                child: Text(
-                                                  "3h 15m",
-                                                  style: TextStyle(
-                                                      color: Settings
-                                                          .COLOR_DARK_TEXT,
-                                                      fontWeight:
-                                                          FontWeight.w300,
-                                                      fontSize: screenWidth *
-                                                          Settings
-                                                              .FONT_SIZE_SMALL),
-                                                ))
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        ParentalGuide(age: 17),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: <Widget>[
-                                            Expanded(
-                                                flex: 1,
-                                                child: Icon(
-                                                  Icons.new_releases,
-                                                  size: screenWidth *
-                                                      Settings.FONT_SIZE_MEDIUM,
-                                                  color: Colors.white,
-                                                )),
-                                            Expanded(
-                                                flex: 4,
-                                                child: Text(
-                                                  "09/20/2019 (US)",
-                                                  style: TextStyle(
-                                                      color: Settings
-                                                          .COLOR_DARK_TEXT,
-                                                      fontWeight:
-                                                          FontWeight.w300,
-                                                      fontSize: screenWidth *
-                                                          Settings
-                                                              .FONT_SIZE_SMALL),
-                                                ))
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Wrap(
-                                          direction: Axis.horizontal,
-                                          alignment: WrapAlignment.start,
-                                          spacing: 2,
-                                          runAlignment:
-                                              WrapAlignment.spaceAround,
-                                          crossAxisAlignment:
-                                              WrapCrossAlignment.center,
-                                          children: <Widget>[
-                                            GenreWidget(
-                                                Genre(1, "Science Ficition")),
-                                          ],
-                                        ),
-                                        Expanded(child: Container())
-                                      ])),
+                              StreamBuilder<dynamic>(
+                                  stream: _detailScreenBloc.detailsStream,
+                                  builder: (context, snapShot) {
+                                    Widget cusomWidget = Container(
+                                        width: screenWidth * 0.5,
+                                        height: screenHeight * 0.3,
+                                        child: Center(
+                                            child: SpinKitCubeGrid(
+                                          color: Settings.COLOR_DARK_HIGHLIGHT,
+                                        )));
+                                    if (snapShot.hasData) {
+                                      switch (snapShot.data.status) {
+                                        case DataStatus.faild:
+                                          {
+                                            cusomWidget = Center(
+                                              child: Text(
+                                                  "Error Loading upcoming Movies"),
+                                            );
+                                            break;
+                                          }
+                                        case DataStatus.complete:
+                                          {
+                                            cusomWidget = Container(
+                                                width: screenWidth * 0.5,
+                                                height: screenHeight * 0.3,
+                                                child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      widget._isMovie
+                                                          ? Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              children: <
+                                                                  Widget>[
+                                                                Expanded(
+                                                                    flex: 1,
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .access_time,
+                                                                      size: screenWidth *
+                                                                          Settings
+                                                                              .FONT_SIZE_MEDIUM,
+                                                                      color: Colors
+                                                                          .white,
+                                                                    )),
+                                                                Expanded(
+                                                                    flex: 4,
+                                                                    child: Text(
+                                                                      "${snapShot.data.data.runtime.toString()} minutes",
+                                                                      style: TextStyle(
+                                                                          color: Settings
+                                                                              .COLOR_DARK_TEXT,
+                                                                          fontWeight: FontWeight
+                                                                              .w300,
+                                                                          fontSize:
+                                                                              screenWidth * Settings.FONT_SIZE_SMALL),
+                                                                    ))
+                                                              ],
+                                                            )
+                                                          : Container(),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      ParentalGuide(age: 17),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: <Widget>[
+                                                          Expanded(
+                                                              flex: 1,
+                                                              child: Icon(
+                                                                Icons
+                                                                    .new_releases,
+                                                                size: screenWidth *
+                                                                    Settings
+                                                                        .FONT_SIZE_MEDIUM,
+                                                                color: Colors
+                                                                    .white,
+                                                              )),
+                                                          Expanded(
+                                                              flex: 4,
+                                                              child: Text(
+                                                                "09/20/2019 (US)",
+                                                                style: TextStyle(
+                                                                    color: Settings
+                                                                        .COLOR_DARK_TEXT,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w300,
+                                                                    fontSize: screenWidth *
+                                                                        Settings
+                                                                            .FONT_SIZE_SMALL),
+                                                              ))
+                                                        ],
+                                                      ),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Wrap(
+                                                        direction:
+                                                            Axis.horizontal,
+                                                        alignment:
+                                                            WrapAlignment.start,
+                                                        spacing: 2,
+                                                        runAlignment:
+                                                            WrapAlignment
+                                                                .spaceAround,
+                                                        crossAxisAlignment:
+                                                            WrapCrossAlignment
+                                                                .center,
+                                                        children: <Widget>[
+                                                          GenreWidget(Genre(1,
+                                                              "Science Ficition")),
+                                                        ],
+                                                      ),
+                                                      Expanded(
+                                                          child: Container())
+                                                    ]));
+                                            break;
+                                          }
+                                        default:
+                                      }
+                                    }
+                                    return cusomWidget;
+                                  }),
                             ],
                           ),
                           SizedBox(
@@ -325,7 +372,73 @@ class _MovieDetailsState extends State<DetailsScreen>
                                       }
                                     }
                                     return widget;
-                                  }))
+                                  })),
+                          ScreenSection(
+                            horizontalPadding:
+                                screenWidth * Settings.VERTICAL_SCREEN_PADDING,
+                            body: Container(
+                                height: screenHeight * 0.5,
+                                child: StreamBuilder<dynamic>(
+                                    stream: _detailScreenBloc.similarDataStream,
+                                    builder: (context, snapshot) {
+                                      Widget customWidget = Center(
+                                          child: SpinKitCubeGrid(
+                                        color: Settings.COLOR_DARK_HIGHLIGHT,
+                                      ));
+                                      if (snapshot.hasData) {
+                                        switch (snapshot.data.status) {
+                                          case DataStatus.faild:
+                                            {
+                                              customWidget = Center(
+                                                child: Text(
+                                                    "Error Loading upcoming Movies"),
+                                              );
+                                              break;
+                                            }
+                                          case DataStatus.complete:
+                                            {
+                                              customWidget = snapshot
+                                                          .data.data.length >
+                                                      0
+                                                  ? ListView.builder(
+                                                      itemExtent:
+                                                          screenWidth * 0.6,
+                                                      itemCount: 6,
+                                                      scrollDirection:
+                                                          Axis.horizontal,
+                                                      itemBuilder: (context,
+                                                              index) =>
+                                                          widget._isMovie
+                                                              ? ItemVerticalView
+                                                                  .movie(
+                                                                  snapshot.data
+                                                                          .data[
+                                                                      index],
+                                                                  heroTag:
+                                                                      "${Settings.HERO_IMAGE_TAG}_VIDEO_UPCOMING_${snapshot.data.data[index].id}",
+                                                                )
+                                                              : ItemVerticalView
+                                                                  .tvShow(
+                                                                  snapshot.data
+                                                                          .data[
+                                                                      index],
+                                                                  heroTag:
+                                                                      "${Settings.HERO_IMAGE_TAG}_VIDEO_UPCOMING_${snapshot.data.data[index].id}",
+                                                                ))
+                                                  : Center(
+                                                      child: Text(
+                                                          "Empty Response"),
+                                                    );
+                                              break;
+                                            }
+                                          default:
+                                        }
+                                      }
+                                      return customWidget;
+                                    })),
+                            onViewMore: null,
+                            title: "Popular",
+                          ),
                         ]),
                   ],
                 ))));

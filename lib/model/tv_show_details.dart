@@ -14,7 +14,6 @@ class TvShowDetails {
   List<String> languages;
   String lastAirDate;
   String name;
-  Null nextEpisodeToAir;
   List<Network> networks;
   int numberOfEpisodes;
   int numberOfSeasons;
@@ -42,7 +41,6 @@ class TvShowDetails {
       this.languages,
       this.lastAirDate,
       this.name,
-      this.nextEpisodeToAir,
       this.networks,
       this.numberOfEpisodes,
       this.numberOfSeasons,
@@ -75,7 +73,6 @@ class TvShowDetails {
     languages = json['languages'].cast<String>();
     lastAirDate = json['last_air_date'];
     name = json['name'];
-    nextEpisodeToAir = json['next_episode_to_air'];
     if (json['networks'] != null) {
       networks = new List<Network>();
       json['networks'].forEach((v) {
@@ -122,7 +119,6 @@ class TvShowDetails {
     data['languages'] = this.languages;
     data['last_air_date'] = this.lastAirDate;
     data['name'] = this.name;
-    data['next_episode_to_air'] = this.nextEpisodeToAir;
     if (this.networks != null) {
       data['networks'] = this.networks.map((v) => v.toJson()).toList();
     }
