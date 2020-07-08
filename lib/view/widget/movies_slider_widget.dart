@@ -2,7 +2,8 @@ import 'dart:ui';
 
 import 'package:TMDB_Mobile/common/settings.dart';
 import 'package:TMDB_Mobile/model/movie.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:TMDB_Mobile/view/screen/details_screen.dart';
+import 'package:TMDB_Mobile/view/widget/hero_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
@@ -19,107 +20,132 @@ class MoviesSlider extends StatefulWidget {
 
 class _MoviesSliderState extends State<MoviesSlider> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     double sliderHeight = MediaQuery.of(context).size.height * 0.3;
     double screenWidth = MediaQuery.of(context).size.width;
-
     return Container(
       width: MediaQuery.of(context).size.width,
       height: sliderHeight,
       child: Swiper(
-        pagination: SwiperPagination(),
-        itemBuilder: (context, index) => Stack(children: <Widget>[
-          Stack(children: <Widget>[
-            Stack(
-              children: <Widget>[
-                SizedBox.expand(
-                    child: CachedNetworkImage(
-                  fit: BoxFit.fill,
-                  placeholder: (context, _) =>
-                      Image.asset("assets/placeholders/poster.jpg"),
-                  imageUrl:
-                      "${Settings.TMDB_API_IMAGE_URL}w300${widget._movies[index].backdropPath}",
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      Center(
-                          child: SizedBox(
-                              width: screenWidth * 0.2,
-                              height: screenWidth * 0.2,
-                              child: Center(
-                                  child: CircularProgressIndicator(
-                                      value: downloadProgress.progress)))),
-                  errorWidget: (context, url, error) => Center(
-                      child: Icon(
-                    Icons.error,
-                    color: Settings.COLOR_DARK_HIGHLIGHT,
-                  )),
-                )),
-                BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 0.2, sigmaY: 0.2),
-                  child: Container(
-                    color: Colors.black.withOpacity(0.1),
-                  ),
-                ),
-              ],
-            ),
-            Container(
-                decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [
-                    Color.fromRGBO(37, 112, 136, 0.9),
-                    Color.fromRGBO(37, 112, 136, 0.2),
-                    Colors.transparent
-                  ],
-                  begin: Alignment.centerLeft,
-                  stops: [0, 0.7, 1],
-                  end: Alignment.centerRight),
-            ))
-          ]),
-          Positioned(
-            height: sliderHeight * 0.5,
-            left: sliderHeight * 0.05,
-            bottom: sliderHeight * 0.1,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  "${widget._movies[index].title}",
-                  style: TextStyle(
-                      fontSize: screenWidth * Settings.FONT_SIZE_MEDIUM,
-                      fontWeight: FontWeight.w400,
-                      color: Settings.COLOR_DARK_TEXT),
-                ),
-                Row(children: [
-                  Container(
-                    margin: EdgeInsets.only(right: sliderHeight * 0.04),
-                    width: sliderHeight * 0.2,
-                    height: sliderHeight * 0.2,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Settings.COLOR_DARK_PRIMARY),
-                    child: Center(
-                        child: IconButton(
-                            icon: Icon(
-                              Icons.play_arrow,
-                              size: sliderHeight * 0.1,
-                              color: Colors.white,
+        viewportFraction: 0.9,
+        scale: 0.9,
+        layout: SwiperLayout.DEFAULT,
+        itemWidth: screenWidth * 0.8,
+        itemHeight: sliderHeight * 0.9,
+        pagination: new SwiperPagination(
+            margin: EdgeInsets.all(0),
+            builder: new SwiperCustomPagination(
+                builder: (BuildContext context, SwiperPluginConfig config) {
+              return new ConstrainedBox(
+                child: new Container(
+                    margin: EdgeInsets.only(top: sliderHeight * 0.3),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List<Widget>.generate(
+                            4,
+                            (index) => Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal:
+                                        index == config.activeIndex ? 10 : 2,
+                                  ),
+                                  width: 20,
+                                  height: 5,
+                                  decoration: BoxDecoration(
+                                      color: index == config.activeIndex
+                                          ? Settings.COLOR_DARK_HIGHLIGHT
+                                          : Settings.COLOR_DARK_SECONDARY,
+                                      borderRadius: BorderRadius.circular(5)),
+                                )))),
+                constraints: new BoxConstraints.expand(height: 60.0),
+              );
+            })),
+        itemBuilder: (context, index) => GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => DetailsScreen.movie(
+                        movie: widget._movies[index],
+                        heroTag:
+                            "${Settings.HERO_IMAGE_TAG}_MOVIE_UPCOMING_SLIDER_${widget._movies[index].id}",
+                      )));
+            },
+            child: SizedBox.shrink(
+              child: ClipRRect(
+                  borderRadius:
+                      BorderRadius.circular(Settings.GENERAL_BORDER_RADIUS),
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                          height: sliderHeight * 0.9,
+                          decoration: BoxDecoration(boxShadow: [
+                            BoxShadow(
+                                color: Settings.COLOR_DARK_SHADOW,
+                                offset: Offset(0, 2),
+                                spreadRadius: 0,
+                                blurRadius: 10)
+                          ]),
+                          child: HeroNetworkImage(
+                            tag:
+                                "${Settings.HERO_IMAGE_TAG}_MOVIE_UPCOMING_SLIDER_${widget._movies[index].id}",
+                            width: screenWidth,
+                            height: sliderHeight * 0.9,
+                            image:
+                                "${Settings.TMDB_API_IMAGE_URL}w300${widget._movies[index].backdropPath}",
+                          )),
+                      BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 0.2, sigmaY: 0.2),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(
+                                Settings.GENERAL_BORDER_RADIUS),
+                          ),
+                          height: sliderHeight * 0.9,
+                        ),
+                      ),
+                      Container(
+                          height: sliderHeight * 0.9,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(
+                                Settings.GENERAL_BORDER_RADIUS),
+                            gradient: LinearGradient(
+                                colors: [
+                                  Settings.COLOR_DARK_SECONDARY
+                                      .withOpacity(0.7),
+                                  Settings.COLOR_DARK_PRIMARY.withOpacity(0.6),
+                                  Settings.COLOR_DARK_HIGHLIGHT
+                                      .withOpacity(0.2),
+                                ],
+                                begin: Alignment.centerLeft,
+                                stops: [0, 0.4, 1],
+                                end: Alignment.centerRight),
+                          )),
+                      Positioned(
+                        height: sliderHeight * 0.5,
+                        left: sliderHeight * 0.05,
+                        bottom: sliderHeight * 0.02,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              "${widget._movies[index].title}",
+                              style: TextStyle(
+                                  fontSize:
+                                      screenWidth * Settings.FONT_SIZE_MEDIUM,
+                                  fontWeight: FontWeight.w500,
+                                  color: Settings.COLOR_DARK_TEXT),
                             ),
-                            onPressed: null)),
-                  ),
-                  Text(
-                    "Watch Trailers",
-                    style: TextStyle(
-                        backgroundColor: Settings.COLOR_DARK_HIGHLIGHT,
-                        fontSize: screenWidth * Settings.FONT_SIZE_SMALL,
-                        fontWeight: FontWeight.w300,
-                        color: Settings.COLOR_DARK_TEXT),
-                  ),
-                ])
-              ],
-            ),
-          )
-        ]),
+                          ],
+                        ),
+                      )
+                    ],
+                  )),
+            )),
         itemCount: 4,
       ),
     );
