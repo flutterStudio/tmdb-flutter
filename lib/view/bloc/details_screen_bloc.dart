@@ -21,8 +21,6 @@ class DetailsScreenBloc extends Bloc {
   Stream<Data<List<Cast>>> get castStream => _castStreamController.stream;
 
   Future<void> getDetails(int id, bool movie) async {
-    _detailsStreamController.sink.add(Data.loading());
-
     var details = movie
         ? await MainRepository().getMovieDetails(id)
         : await MainRepository().getTvShowDetails(id);
@@ -30,16 +28,12 @@ class DetailsScreenBloc extends Bloc {
   }
 
   Future<void> getCast(int id, bool movie) async {
-    _castStreamController.sink.add(Data.loading());
-
     var cast = await MainRepository()
         .getCast(id, movie ? TmdbEndPoint.movie : TmdbEndPoint.tv);
     _castStreamController.sink.add(cast);
   }
 
   Future<void> getSimilar(int id, bool movie) async {
-    _similarDataStreamController.sink.add(Data.loading());
-
     var cast = movie
         ? await MainRepository().getSimilarMovies(id)
         : await MainRepository().getSimilarTvShows(id);
@@ -48,11 +42,13 @@ class DetailsScreenBloc extends Bloc {
   }
 
   Future<void> getData(int id, bool movie) async {
+    _detailsStreamController.sink.add(Data.loading());
+    _castStreamController.sink.add(Data.loading());
     _similarDataStreamController.sink.add(Data.loading());
 
-    getDetails(id, movie);
-    getCast(id, movie);
-    getSimilar(id, movie);
+    await getDetails(id, movie);
+    await getCast(id, movie);
+    await getSimilar(id, movie);
   }
 
   @override

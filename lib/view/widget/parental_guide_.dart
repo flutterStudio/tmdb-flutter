@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class ParentalGuide extends StatelessWidget {
-  final int age;
-  ParentalGuide({@required this.age}) : assert(age != null);
+  final bool adult;
+  ParentalGuide({@required this.adult}) : assert(adult != null);
   @override
   Widget build(BuildContext context) => Container(
-        padding: EdgeInsets.all(2),
+        padding: EdgeInsets.symmetric(vertical: 3, horizontal: 5),
         decoration: BoxDecoration(
-            border: Border.all(color: Colors.white),
+            color: adult ? Colors.redAccent : Settings.COLOR_DARK_HIGHLIGHT,
             borderRadius: BorderRadius.circular(3)),
         child: Text(
-          "PG-$age",
+          adult ? "for adults" : "for all",
           style: TextStyle(
               color: Settings.COLOR_DARK_TEXT,
               fontWeight: FontWeight.w400,

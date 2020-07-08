@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:TMDB_Mobile/common/settings.dart';
 import 'package:TMDB_Mobile/model/cast.dart';
-import 'package:TMDB_Mobile/model/genre.dart';
 import 'package:TMDB_Mobile/model/movie.dart';
 import 'package:TMDB_Mobile/model/tvshow_model.dart';
 import 'package:TMDB_Mobile/utils/data.dart';
@@ -157,13 +156,6 @@ class _MovieDetailsState extends State<DetailsScreen>
                                   tag: widget._heroTag,
                                   width: screenWidth * 0.45,
                                   height: screenHeight * 0.4,
-                                  destination: widget._movie != null
-                                      ? DetailsScreen.movie(
-                                          movie: widget._movie,
-                                        )
-                                      : DetailsScreen.tvShow(
-                                          tvShow: widget._tvShow,
-                                        ),
                                   image:
                                       "${Settings.TMDB_API_IMAGE_URL}w300${widget._movie != null ? widget._movie.posterPath : widget._tvShow.posterPath}",
                                 ),
@@ -238,7 +230,48 @@ class _MovieDetailsState extends State<DetailsScreen>
                                                       SizedBox(
                                                         height: 10,
                                                       ),
-                                                      ParentalGuide(age: 17),
+                                                      widget._isMovie
+                                                          ? ParentalGuide(
+                                                              adult: snapShot
+                                                                  .data
+                                                                  .data
+                                                                  .adult)
+                                                          : Container(
+                                                              padding:
+                                                                  EdgeInsets.all(
+                                                                      3),
+                                                              decoration: BoxDecoration(
+                                                                  color: snapShot
+                                                                          .data
+                                                                          .data
+                                                                          .inProduction
+                                                                      ? Colors
+                                                                          .redAccent
+                                                                      : Settings
+                                                                          .COLOR_DARK_HIGHLIGHT,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              3)),
+                                                              child: Text(
+                                                                snapShot
+                                                                        .data
+                                                                        .data
+                                                                        .inProduction
+                                                                    ? "in production"
+                                                                    : "released",
+                                                                style: TextStyle(
+                                                                    color: Settings
+                                                                        .COLOR_DARK_TEXT,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    fontSize: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width *
+                                                                        Settings
+                                                                            .FONT_SIZE_SMALL),
+                                                              )),
                                                       SizedBox(
                                                         height: 10,
                                                       ),
@@ -261,7 +294,9 @@ class _MovieDetailsState extends State<DetailsScreen>
                                                           Expanded(
                                                               flex: 4,
                                                               child: Text(
-                                                                "09/20/2019 (US)",
+                                                                widget._isMovie
+                                                                    ? "${snapShot.data.data.releaseDate} ${snapShot.data.data.status}"
+                                                                    : "${snapShot.data.data.firstAirDate} ${snapShot.data.data.status}",
                                                                 style: TextStyle(
                                                                     color: Settings
                                                                         .COLOR_DARK_TEXT,
@@ -278,22 +313,30 @@ class _MovieDetailsState extends State<DetailsScreen>
                                                         height: 10,
                                                       ),
                                                       Wrap(
-                                                        direction:
-                                                            Axis.horizontal,
-                                                        alignment:
-                                                            WrapAlignment.start,
-                                                        spacing: 2,
-                                                        runAlignment:
-                                                            WrapAlignment
-                                                                .spaceAround,
-                                                        crossAxisAlignment:
-                                                            WrapCrossAlignment
-                                                                .center,
-                                                        children: <Widget>[
-                                                          GenreWidget(Genre(1,
-                                                              "Science Ficition")),
-                                                        ],
-                                                      ),
+                                                          direction:
+                                                              Axis.horizontal,
+                                                          alignment:
+                                                              WrapAlignment
+                                                                  .start,
+                                                          spacing: 2,
+                                                          runAlignment:
+                                                              WrapAlignment
+                                                                  .spaceAround,
+                                                          crossAxisAlignment:
+                                                              WrapCrossAlignment
+                                                                  .center,
+                                                          children: List.generate(
+                                                              snapShot
+                                                                  .data
+                                                                  .data
+                                                                  .genres
+                                                                  .length,
+                                                              (index) => GenreWidget(
+                                                                  snapShot
+                                                                          .data
+                                                                          .data
+                                                                          .genres[
+                                                                      index]))),
                                                       Expanded(
                                                           child: Container())
                                                     ]));
@@ -415,7 +458,7 @@ class _MovieDetailsState extends State<DetailsScreen>
                                                                           .data[
                                                                       index],
                                                                   heroTag:
-                                                                      "${Settings.HERO_IMAGE_TAG}_VIDEO_UPCOMING_${snapshot.data.data[index].id}",
+                                                                      "${Settings.HERO_IMAGE_TAG}_VIDEO_SIMILAR_${snapshot.data.data[index].id}",
                                                                 )
                                                               : ItemVerticalView
                                                                   .tvShow(
@@ -437,7 +480,7 @@ class _MovieDetailsState extends State<DetailsScreen>
                                       return customWidget;
                                     })),
                             onViewMore: null,
-                            title: "Popular",
+                            title: "Similar to this",
                           ),
                         ]),
                   ],
