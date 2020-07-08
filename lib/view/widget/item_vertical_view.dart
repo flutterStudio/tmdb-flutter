@@ -28,7 +28,6 @@ class ItemVerticalView extends StatelessWidget {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-        // margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
         child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -37,7 +36,7 @@ class ItemVerticalView extends StatelessWidget {
           Container(
               child: HeroNetworkImage(
             width: screenWidth * 0.5,
-            height: screenHeight * 0.35,
+            height: screenWidth * 0.75,
             tag: _heroTag,
             destination: _movie != null
                 ? DetailsScreen.movie(

@@ -168,8 +168,8 @@ class _MovieDetailsState extends State<DetailsScreen>
                                         width: screenWidth * 0.5,
                                         height: screenHeight * 0.3,
                                         child: Center(
-                                            child: SpinKitCubeGrid(
-                                          color: Settings.COLOR_DARK_HIGHLIGHT,
+                                            child: SpinKitDoubleBounce(
+                                          color: Settings.COLOR_DARK_SECONDARY,
                                         )));
                                     if (snapShot.hasData) {
                                       switch (snapShot.data.status) {
@@ -384,7 +384,7 @@ class _MovieDetailsState extends State<DetailsScreen>
                                   stream: _detailScreenBloc.castStream,
                                   builder: (context, snapShot) {
                                     Widget widget = Center(
-                                        child: SpinKitCubeGrid(
+                                        child: SpinKitDoubleBounce(
                                       color: Settings.COLOR_DARK_HIGHLIGHT,
                                     ));
                                     if (snapShot.hasData) {
@@ -425,7 +425,7 @@ class _MovieDetailsState extends State<DetailsScreen>
                                     stream: _detailScreenBloc.similarDataStream,
                                     builder: (context, snapshot) {
                                       Widget customWidget = Center(
-                                          child: SpinKitCubeGrid(
+                                          child: SpinKitDoubleBounce(
                                         color: Settings.COLOR_DARK_HIGHLIGHT,
                                       ));
                                       if (snapshot.hasData) {
