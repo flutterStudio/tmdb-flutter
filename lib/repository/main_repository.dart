@@ -125,24 +125,31 @@ class MainRepository {
         for (var rawMovie in jsonResponse['results'] as List) {
           movies.add(Movie.fromJson(rawMovie));
         }
-      }
-      data = Data.complete(
-          data: movies,
-          page: jsonResponse["page"],
-          totalPages: jsonResponse["total_pages"],
-          totalResults: jsonResponse["total_results"]);
-      if (!trending) {
-        _cachedData[endpoint].data.insertAll(0, data.data);
-        _cachedData[endpoint].copyProperties(data);
-      } else {
-        _trendingMovies.data.insertAll(0, data.data);
+
+        data = Data.complete(
+            data: movies,
+            page: jsonResponse["page"],
+            totalPages: jsonResponse["total_pages"],
+            totalResults: jsonResponse["total_results"]);
+        // if (!trending) {
+        //   _cachedData[endpoint].data.insertAll(0, data.data);
+        //   _cachedData[endpoint].copyProperties(data);
+        // } else {
+        //   _trendingMovies.data.insertAll(0, data.data);
+        //   _cachedData[endpoint].copyProperties(data);
+        // }
+        if (requestType == RequestType.fetch) {
+          _cachedData[endpoint].data = data.data;
+        } else {
+          _cachedData[endpoint].data.addAll(data.data);
+        }
         _cachedData[endpoint].copyProperties(data);
       }
     } catch (e) {
       data = Data.faild(
           previousData: _cachedData[endpoint].data, message: e.toString());
     }
-    return data;
+    return _cachedData[endpoint];
   }
 
   /// Fetches Tv shows from api with filters options.
@@ -212,21 +219,25 @@ class MainRepository {
         }
       }
 
-      data = Data.complete(
-          data: tvShows,
-          page: jsonResponse["page"],
-          totalPages: jsonResponse["total_pages"],
-          totalResults: jsonResponse["total_results"]);
-      tvShows.length > 0 && requestType == RequestType.fetch
-          ? _cachedData[endpoint].data = tvShows
-          : _cachedData[endpoint].data.addAll(tvShows);
+      if (tvShows.length > 0) {
+        data = Data.complete(
+            data: tvShows,
+            page: jsonResponse["page"],
+            totalPages: jsonResponse["total_pages"],
+            totalResults: jsonResponse["total_results"]);
+        if (requestType == RequestType.fetch) {
+          _cachedData[endpoint].data = tvShows;
+        } else {
+          _cachedData[endpoint].data.addAll(tvShows);
+        }
+      }
 
       _cachedData[endpoint].copyProperties(data);
     } catch (e) {
       data = Data.faild(
           previousData: _cachedData[endpoint].data, message: e.toString());
     }
-    return data;
+    return _cachedData[endpoint];
   }
 
   /// Fetches Genres from api with filters options.

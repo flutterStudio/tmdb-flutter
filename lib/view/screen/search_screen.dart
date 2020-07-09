@@ -1,5 +1,6 @@
 import 'package:TMDB_Mobile/common/settings.dart';
 import 'package:TMDB_Mobile/model/movie.dart';
+import 'package:TMDB_Mobile/model/tvshow_model.dart';
 import 'package:TMDB_Mobile/utils/data.dart';
 import 'package:TMDB_Mobile/view/bloc/search_bloc.dart';
 import 'package:TMDB_Mobile/view/widget/dialog_search_filter.dart';
@@ -214,39 +215,45 @@ class _SearchScreenState extends State<SearchScreen> {
                     }
                   },
                   controller: _refreshController,
-                  child: GridView.builder(
+                  child: GridView(
                       addAutomaticKeepAlives: true,
                       padding: EdgeInsets.all(0),
-                      itemCount: snapshot.data.data.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
                           crossAxisSpacing: 5,
                           mainAxisSpacing: 5,
                           childAspectRatio: 0.6),
-                      itemBuilder: (context, index) => snapshot.data
-                              is Data<List<Movie>>
-                          ? ItemStackedView.movie(
-                              offline: false,
-                              heroTag:
-                                  "${Settings.HERO_IMAGE_TAG}_MOVIE_SEARCH_${snapshot.data.data[index].id}",
-                              movie: snapshot.data.data[index],
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              height: MediaQuery.of(context).size.height * 0.35,
-                              highlight: index % 2 == 0
-                                  ? Settings.COLOR_DARK_PRIMARY
-                                  : Settings.COLOR_DARK_HIGHLIGHT,
-                            )
-                          : ItemStackedView.tv(
-                              offline: false,
-                              heroTag:
-                                  "${Settings.HERO_IMAGE_TAG}_TV_SEARCH_${snapshot.data.data[index].id}",
-                              tvShow: snapshot.data.data[index],
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              height: MediaQuery.of(context).size.height * 0.35,
-                              highlight: index % 2 == 0
-                                  ? Settings.COLOR_DARK_PRIMARY
-                                  : Settings.COLOR_DARK_HIGHLIGHT,
-                            ))),
+                      children: snapshot.data is Data<List<Movie>>
+                          ? (snapshot.data.data as List<Movie>)
+                              .map((e) => ItemStackedView.movie(
+                                    offline: false,
+                                    heroTag:
+                                        "${Settings.HERO_IMAGE_TAG}_MOVIE_SEARCH_${e.id}",
+                                    movie: e,
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.5,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.35,
+                                    highlight: e.id % 2 == 0
+                                        ? Settings.COLOR_DARK_PRIMARY
+                                        : Settings.COLOR_DARK_HIGHLIGHT,
+                                  ))
+                              .toList()
+                          : (snapshot.data.data as List<TvShow>)
+                              .map((e) => ItemStackedView.tv(
+                                    offline: false,
+                                    heroTag:
+                                        "${Settings.HERO_IMAGE_TAG}_TV_SEARCH_${e.id}",
+                                    tvShow: e,
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.5,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.35,
+                                    highlight: e.id % 2 == 0
+                                        ? Settings.COLOR_DARK_PRIMARY
+                                        : Settings.COLOR_DARK_HIGHLIGHT,
+                                  ))
+                              .toList())),
             );
             break;
           }

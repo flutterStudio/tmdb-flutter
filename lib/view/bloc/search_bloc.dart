@@ -335,9 +335,10 @@ class SearchBloc extends Bloc with ChangeNotifier {
 
           var data = await MainRepository().getMovies(tmdbEndPoint,
               options: options, requestType: requestType);
-          requestType == RequestType.fetch && data.status == DataStatus.complete
-              ? discoveredMovies = data.data
-              : discoveredMovies.addAll(data.data);
+          // requestType == RequestType.fetch && data.status == DataStatus.complete
+          //     ?
+          discoveredMovies = data.data;
+          // : discoveredMovies.addAll(data.data);
           page = data.page;
           data.data = discoveredMovies;
 
@@ -353,9 +354,10 @@ class SearchBloc extends Bloc with ChangeNotifier {
 
           var data = await MainRepository().getMovies(tmdbEndPoint,
               options: options, requestType: requestType);
-          requestType == RequestType.fetch && data.status == DataStatus.complete
-              ? moviesSearchResult = data.data
-              : moviesSearchResult.addAll(data.data);
+          // requestType == RequestType.fetch && data.status == DataStatus.complete
+          //     ?
+          moviesSearchResult = data.data;
+          // : moviesSearchResult.addAll(data.data);
           page = data.page;
           data.data = moviesSearchResult;
 
@@ -371,9 +373,10 @@ class SearchBloc extends Bloc with ChangeNotifier {
           }
           var data = await MainRepository().getTvShows(tmdbEndPoint,
               options: options, requestType: requestType);
-          requestType == RequestType.fetch
-              ? discoveredTvShows = data.data
-              : discoveredTvShows.addAll(data.data);
+          // requestType == RequestType.fetch
+          //     ?
+          discoveredTvShows = data.data;
+          // : discoveredTvShows.addAll(data.data);
           // current page
           page = data.page;
           data.data = discoveredTvShows;
@@ -385,12 +388,13 @@ class SearchBloc extends Bloc with ChangeNotifier {
           if (requestType == RequestType.fetch) {
             _searchTvShowStreamController.sink
                 .add(Data<List<TvShow>>.loading());
-          }
+          } else {}
           var data = await MainRepository().getTvShows(tmdbEndPoint,
               options: options, requestType: requestType);
-          requestType == RequestType.fetch
-              ? tvShowsSrearchResult = data.data
-              : tvShowsSrearchResult.addAll(data.data);
+          // requestType == RequestType.fetch
+          //     ?
+          tvShowsSrearchResult = data.data;
+          // : tvShowsSrearchResult.addAll(data.data);
           // current page
           page = data.page;
           data.data = tvShowsSrearchResult;
