@@ -79,4 +79,8 @@ class Utils {
         .substring(value.toString().indexOf('.') + 1, value.toString().length);
     return result;
   }
+
+  static String youtubeThumnail(String id) {
+    return "http://img.youtube.com/vi/$id/0.jpg";
+  }
 }

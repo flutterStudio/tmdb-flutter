@@ -131,13 +131,6 @@ class MainRepository {
             page: jsonResponse["page"],
             totalPages: jsonResponse["total_pages"],
             totalResults: jsonResponse["total_results"]);
-        // if (!trending) {
-        //   _cachedData[endpoint].data.insertAll(0, data.data);
-        //   _cachedData[endpoint].copyProperties(data);
-        // } else {
-        //   _trendingMovies.data.insertAll(0, data.data);
-        //   _cachedData[endpoint].copyProperties(data);
-        // }
         if (requestType == RequestType.fetch) {
           _cachedData[endpoint].data = data.data;
         } else {
@@ -319,7 +312,7 @@ class MainRepository {
     return data;
   }
 
-  /// Get Details of the movie with the following [id].,
+  /// Get videos of the movie with the following [id].,
   Future<Data<List<Video>>> getMovieVideos(int id,
       {RequestType equestType = RequestType.fetch}) async {
     Data<List<Video>> data = Data.loading(initialData: []);
@@ -337,15 +330,43 @@ class MainRepository {
 
       data = Data.complete(
           data: videos,
-          page: jsonResponse["page"],
-          totalPages: jsonResponse["total_pages"],
-          totalResults: jsonResponse["total_results"]);
+          page: jsonResponse["page"] ?? 0,
+          totalPages: jsonResponse["total_pages"] ?? 0,
+          totalResults: jsonResponse["total_results"] ?? 0);
     } catch (e) {
       data = Data.faild(previousData: [], message: e.toString());
     }
     return data;
   }
 
+  /// Get videos of the tv shpw with the following [id].,
+  Future<Data<List<Video>>> getTvShowVideos(int id,
+      {RequestType equestType = RequestType.fetch}) async {
+    Data<List<Video>> data = Data.loading(initialData: []);
+
+    List<Video> videos = [];
+    try {
+      String rawResponse = await TmdbService()
+          .get(TmdbEndPoint.tv, null, spacialOption: "/$id/videos");
+      var jsonResponse = jsonDecode(rawResponse) as Map;
+      if ((jsonResponse['results'] as List).length > 0) {
+        for (var rawTVideo in jsonResponse['results'] as List) {
+          videos.add(Video.fromJson(rawTVideo));
+        }
+      }
+
+      data = Data.complete(
+          data: videos,
+          page: jsonResponse["page"] ?? 0,
+          totalPages: jsonResponse["total_pages"] ?? 0,
+          totalResults: jsonResponse["total_results"] ?? 0);
+    } catch (e) {
+      data = Data.faild(previousData: [], message: e.toString());
+    }
+    return data;
+  }
+
+  /// Get cast of the tv shpw with the following [id].,
   Future<Data<List<Cast>>> getCast(int id, TmdbEndPoint endpoint,
       {RequestType equestType = RequestType.fetch}) async {
     Data<List<Cast>> data = Data.loading(initialData: []);

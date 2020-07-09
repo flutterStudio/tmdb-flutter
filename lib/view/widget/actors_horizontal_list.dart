@@ -28,7 +28,7 @@ class ActorsHorizontal extends StatelessWidget {
                   child: HeroNetworkImage(
                     width: size,
                     height: size,
-                    radius: size,
+                    radius: BorderRadius.circular(size),
                     image: cast[index].profilePath == null
                         ? null
                         : "${Settings.TMDB_API_IMAGE_URL}w300${cast[index].profilePath}",

@@ -8,7 +8,7 @@ typedef OnHeroTap = void Function();
 class HeroNetworkImage extends StatelessWidget {
   final double _width;
   final double _height;
-  final double _radius;
+  final BorderRadius _radius;
   final String _tag;
   final String _image;
   final Widget _placeholder;
@@ -20,7 +20,7 @@ class HeroNetworkImage extends StatelessWidget {
       double width = double.infinity,
       double height = double.infinity,
       @required String tag,
-      double radius = 0.0,
+      BorderRadius radius = BorderRadius.zero,
       Widget destination,
       Widget placeholder,
       Widget errorWidget})
@@ -50,7 +50,7 @@ class HeroNetworkImage extends StatelessWidget {
                             builder: (context) => _destination))
                         : null,
                     child: ClipRRect(
-                        borderRadius: BorderRadius.circular(_radius),
+                        borderRadius: _radius,
                         child: _image != null
                             ? CachedNetworkImage(
                                 fit: BoxFit.cover,

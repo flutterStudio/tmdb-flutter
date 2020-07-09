@@ -13,10 +13,12 @@ import 'package:TMDB_Mobile/view/widget/horizontal_movie_options.dart';
 import 'package:TMDB_Mobile/view/widget/item_vertical_view.dart';
 import 'package:TMDB_Mobile/view/widget/parental_guide_.dart';
 import 'package:TMDB_Mobile/view/widget/screen_section.dart';
+import 'package:TMDB_Mobile/view/widget/video_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 
 class DetailsScreen extends StatefulWidget {
   final Movie _movie;
@@ -416,6 +418,70 @@ class _MovieDetailsState extends State<DetailsScreen>
                                     }
                                     return widget;
                                   })),
+                          // Videos.
+                          ScreenSection(
+                            title: "Trailers",
+                            background: Settings.COLOR_DARK_SECONDARY,
+                            body: Container(
+                              height: screenHeight * 0.35,
+                              child: StreamBuilder<dynamic>(
+                                  stream: _detailScreenBloc.videosStream,
+                                  builder: (context, snapshot) {
+                                    Widget customWidget = Center(
+                                        child: SpinKitDoubleBounce(
+                                      color: Settings.COLOR_DARK_HIGHLIGHT,
+                                    ));
+                                    if (snapshot.hasData) {
+                                      switch (snapshot.data.status) {
+                                        case DataStatus.faild:
+                                          {
+                                            customWidget = Center(
+                                              child: Text(
+                                                  "Error Loading upcoming Movies"),
+                                            );
+                                            break;
+                                          }
+                                        case DataStatus.complete:
+                                          {
+                                            customWidget = snapshot
+                                                        .data.data.length >
+                                                    0
+                                                ? Swiper(
+                                                    scale: 0.85,
+                                                    viewportFraction: 0.8,
+                                                    loop: false,
+                                                    itemCount: snapshot.data
+                                                                .data.length >=
+                                                            6
+                                                        ? 6
+                                                        : snapshot
+                                                            .data.data.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      return VideoItemView(
+                                                          radius: screenWidth *
+                                                              0.05,
+                                                          width:
+                                                              screenWidth * 0.8,
+                                                          height:
+                                                              screenWidth * 0.6,
+                                                          video: snapshot.data
+                                                              .data[index]);
+                                                    },
+                                                  )
+                                                : Center(
+                                                    child:
+                                                        Text("Empty Response"),
+                                                  );
+                                            break;
+                                          }
+                                        default:
+                                      }
+                                    }
+                                    return customWidget;
+                                  }),
+                            ),
+                          ),
                           // Similar items.
                           ScreenSection(
                             horizontalPadding:
