@@ -6,11 +6,11 @@ import 'package:TMDB_Mobile/view/bloc/bloc.dart';
 import 'package:rxdart/subjects.dart';
 
 class MoviesScreenBloc extends Bloc {
-  List<Movie> _trending;
-  List<Movie> _popular;
-  List<Movie> _latest;
-  List<Movie> _nowPlaying;
-  List<Movie> _upcoming;
+  Data<List<Movie>> _trending;
+  Data<List<Movie>> _popular;
+  Data<List<Movie>> _latest;
+  Data<List<Movie>> _nowPlaying;
+  Data<List<Movie>> _upcoming;
 
   BehaviorSubject<Data<List<Movie>>> _trendingStreamController;
   BehaviorSubject<Data<List<Movie>>> _popularStreamController;
@@ -18,12 +18,18 @@ class MoviesScreenBloc extends Bloc {
   BehaviorSubject<Data<List<Movie>>> _upcomingController;
   BehaviorSubject<Data<List<Movie>>> _nowPlayingController;
 
+  Data<List<Movie>> get trending => _trending;
+  Data<List<Movie>> get popular => _popular;
+  Data<List<Movie>> get latest => _latest;
+  Data<List<Movie>> get nowPlaying => _nowPlaying;
+  Data<List<Movie>> get upcoming => _upcoming;
+
   MoviesScreenBloc() {
-    _trending = [];
-    _popular = [];
-    _latest = [];
-    _nowPlaying = [];
-    _upcoming = [];
+    _trending = Data.loading();
+    _popular = Data.loading();
+    _latest = Data.loading();
+    _nowPlaying = Data.loading();
+    _upcoming = Data.loading();
     _trendingStreamController = BehaviorSubject<Data<List<Movie>>>();
     _popularStreamController = BehaviorSubject<Data<List<Movie>>>();
     _latestStreamController = BehaviorSubject<Data<List<Movie>>>();
@@ -50,7 +56,7 @@ class MoviesScreenBloc extends Bloc {
       data = await MainRepository()
           .getMovies(TmdbEndPoint.trendingMovieWeek, trending: true);
       if (data.hasData && data.data.length > 0) {
-        _trending = data.data;
+        _trending = data;
       } else {
         data.data = _trending;
       }
@@ -67,7 +73,7 @@ class MoviesScreenBloc extends Bloc {
     try {
       data = await MainRepository().getMovies(TmdbEndPoint.moviePopular);
       if (data.hasData && data.data.length > 0) {
-        _popular = data.data;
+        _popular = data;
       } else {
         data.data = _popular;
       }
@@ -84,7 +90,7 @@ class MoviesScreenBloc extends Bloc {
     try {
       data = await MainRepository().getMovies(TmdbEndPoint.movieUpcoming);
       if (data.hasData && data.data.length > 0) {
-        _upcoming = data.data;
+        _upcoming = data;
       } else {
         data.data = _upcoming;
       }
@@ -101,7 +107,7 @@ class MoviesScreenBloc extends Bloc {
     try {
       data = await MainRepository().getMovies(TmdbEndPoint.movieLatest);
       if (data.hasData && data.data.length > 0) {
-        _latest = data.data;
+        _latest = data;
       } else {
         data.data = _latest;
       }
@@ -118,7 +124,7 @@ class MoviesScreenBloc extends Bloc {
     try {
       data = await MainRepository().getMovies(TmdbEndPoint.movieNowPlaying);
       if (data.hasData && data.data.length > 0) {
-        _nowPlaying = data.data;
+        _nowPlaying = data;
       } else {
         data.data = _nowPlaying;
       }

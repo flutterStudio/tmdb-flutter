@@ -3,6 +3,7 @@ import 'package:TMDB_Mobile/model/movie.dart';
 import 'package:TMDB_Mobile/utils/data.dart';
 import 'package:TMDB_Mobile/view/bloc/movies_screen_bloc.dart';
 import 'package:TMDB_Mobile/view/screen/details_screen.dart';
+import 'package:TMDB_Mobile/view/screen/movies_list_screen.dart';
 import 'package:TMDB_Mobile/view/widget/hero_network_image.dart';
 import 'package:TMDB_Mobile/view/widget/item_vertical_view.dart';
 import 'package:TMDB_Mobile/view/widget/movie_rating_rectangular.dart';
@@ -91,7 +92,13 @@ class _MoviesScreenState extends State<MoviesScreen> {
                       }
                       return widget;
                     }),
-                onViewMore: null,
+                onViewMore: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => MoviesListScreen(
+                          _moviesScreenBloc.upcoming,
+                          TmdbEndPoint.movieUpcoming,
+                          "Upcoming Movies")));
+                },
                 title: "Upcoming",
               ),
               ScreenSection(
@@ -139,10 +146,23 @@ class _MoviesScreenState extends State<MoviesScreen> {
                           }
                           return widget;
                         })),
-                onViewMore: null,
+                onViewMore: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => MoviesListScreen(
+                          _moviesScreenBloc.popular,
+                          TmdbEndPoint.moviePopular,
+                          "Popular Movies")));
+                },
                 title: "Popular",
               ),
               ScreenSection(
+                  onViewMore: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => MoviesListScreen(
+                            _moviesScreenBloc.trending,
+                            TmdbEndPoint.trendingMovieWeek,
+                            "Trending Movies")));
+                  },
                   title: "Trending",
                   horizontalPadding:
                       screenWidth * Settings.VERTICAL_SCREEN_PADDING,
