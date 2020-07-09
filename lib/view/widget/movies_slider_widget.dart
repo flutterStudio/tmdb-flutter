@@ -105,13 +105,10 @@ class _MoviesSliderState extends State<MoviesSlider> {
                             gradient: LinearGradient(
                                 colors: [
                                   Colors.accents[index],
-                                  Settings.COLOR_DARK_HIGHLIGHT
-                                      .withOpacity(0.4),
-                                  Settings.COLOR_DARK_HIGHLIGHT
-                                      .withOpacity(0.4),
+                                  Settings.COLOR_DARK_HIGHLIGHT.withOpacity(0),
                                 ],
                                 begin: Alignment.centerLeft,
-                                stops: [0, 0.5, 1],
+                                stops: [0, 0.8],
                                 end: Alignment.centerRight),
                           )),
                       Positioned(
